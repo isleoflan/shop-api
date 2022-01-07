@@ -81,16 +81,14 @@ jobs:
             rm -rf tests
             rm -rf vendor
             rm codeception.yml
-            rm *.pem
             composer install --no-dev
             cd ..
             rm "${{ secrets.BASE_PATH }}live"
             rm "${{ secrets.BASE_PATH }}staging"
             ln -s "${{ secrets.DEPLOYMENTS_FOLDER }}/${{ steps.deployment-id.outputs.DEPLOYMENT_ID }}" live
             cd live
-            date +"%y.%V.%u-%H%M" > classes/IOL/SSO/v1/VERSION.vsf
-            cp ${{ secrets.BASE_PATH }}${{ secrets.DEPLOYMENTS_FOLDER }}/*.pem .
-      
+            date +"%y.%V.%u-%H%M" > classes/IOL/Shop/v1/VERSION.vsf
+
       
       - name: end maintenance mode
         if: always()
