@@ -10,6 +10,7 @@
     }
   ],
   "require": {
-    "isleoflan/iol-sso-library": "*"
+    "isleoflan/iol-sso-library": "*",
+    "vlucas/phpdotenv": "^5.3"
   }
 }
