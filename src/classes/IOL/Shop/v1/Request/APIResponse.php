@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 namespace IOL\Shop\v1\Request;
 
-use IOL\Shop\v1\DataSource\Database;
 use IOL\Shop\v1\DataType\Date;
 use IOL\Shop\v1\DataType\UUID;
-use IOL\Shop\v1\Entity\App;
 use IOL\Shop\v1\BitMasks\RequestMethod;
-use IOL\Shop\v1\Entity\User;
-use IOL\Shop\v1\Exceptions\IOLException;
+use IOL\SSO\SDK\Client;
+use IOL\SSO\SDK\Exceptions\SSOException;
+use IOL\SSO\SDK\Service\Authentication;
+use IOL\Shop\v1\Request\Error;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\NoReturn;
 
 class APIResponse
 {
-    /**
-     * defines the database table, in which the requests are being saved
-     *
-     * @see \IOL\SSO\v1\Request\APIResponse::$saveRequest
-     * @see \IOL\SSO\v1\Request\APIResponse::$saveResponse
-     */
-    public const DB_TABLE = 'api_requests';
+    public const APP_TOKEN = '253051de-50b6-445f-8486-f60425dc5651';
 
     /**
      * @var APIResponse|null $instance
@@ -49,38 +43,13 @@ class APIResponse
     private bool $authRequired = true;
 
     /**
-     * @var bool $ssoFrontendOnly
-     *
-     */
-    private bool $ssoFrontendOnly = false;
-
-    /**
      * @var string $returnType
      *
      * the here set value is used in the "Content-Type" header.
      * this is set to 'application/json', so JS/TS frontends like Angular / Vue / etc. don't need
      * to parse the data into objects
      */
-    private readonly string $returnType = 'application/json';
-
-    /**
-     * @var bool $saveRequest
-     *
-     * determines, if an image of the request should be saved in the DB
-     * this should be set to false in productive environments
-     * set this to true, if you need it for debugging
-     */
-    private bool $saveRequest = false;
-
-    /**
-     * @var bool $saveResponse
-     *
-     * if this is set to true, the data, which gets output to the enduser, is also
-     * saved alongside the request data
-     *
-     * @see \IOL\SSO\v1\Request\APIResponse::$saveRequest needs to be set to true
-     */
-    private bool $saveResponse = true;
+    private readonly string $returnType;
 
 
     /**
@@ -90,15 +59,6 @@ class APIResponse
      */
     private string $id;
 
-    /**
-     * @var \IOL\SSO\v1\DataType\Date $startTime
-     *
-     * gets set on script startup, is used for saving the request to the database, so the execution time
-     * can be calculated and long-lasting requests can be optimized.
-     *
-     * @see \IOL\SSO\v1\Request\APIResponse::$saveRequest
-     */
-    private Date $startTime;
 
     /**
      * @var bool $responseSent
@@ -110,7 +70,7 @@ class APIResponse
      * if the render() method has triggered manually, the shutdown function would send out the response a second
      * time
      *
-     * @see \IOL\SSO\v1\Request\APIResponse::render()
+     * @see \IOL\Shop\v1\Request\APIResponse::render()
      * @see _loader.php:29
      */
     private bool $responseSent = false;
@@ -142,14 +102,11 @@ class APIResponse
      * ID. If you don't intend to use the request saving as a debug tool, you can safely disable this.
      * Also sends a CORS header as the first thing
      *
-     * @see \IOL\SSO\v1\Request\APIResponse::getInstance() Actual instantiation happens here
+     * @see \IOL\Shop\v1\Request\APIResponse::getInstance() Actual instantiation happens here
      */
     protected function __construct()
     {
-        $this->startTime = new Date('u');
-        if ($this->isSaveRequest()) {
-            $this->setId(UUID::newId('api_requests'));
-        }
+        $this->returnType = 'application/json';
         $this->sendCORSHeader();
     }
 
@@ -181,23 +138,50 @@ class APIResponse
         $this->authRequired = $needsAuth;
     }
 
-    public function check(): ?User
+    /**
+     * @return string|null returns the User ID, if successful
+     */
+    public function check(): ?string
     {
         $this->checkForOptionsMethod();
-
-        if (!$this->isSsoFrontendOnly()) {
-            $this->checkForAppHeader();
-        }
 
         if (!$this->getAllowedRequestMethods()->isAllowed(self::getRequestMethod())) {
             $this->addError(100004)->render();
         }
 
         if ($this->authRequired) {
-            return Authentication::authenticate();
+            return self::getAuthToken();
         }
 
         return null;
+    }
+    public static function getAuthToken(): string
+    {
+        // check, if Authorization header is present
+        $authToken = false;
+        $authHeader = APIResponse::getRequestHeader('Authorization');
+        if (!is_null($authHeader)) {
+            if (str_starts_with($authHeader, 'Bearer ')) {
+                $authToken = substr($authHeader, 7);
+            }
+        }
+        if (!$authToken) {
+            // no actual token has been transmitted. Abort execution and send request to the gulag
+            APIResponse::getInstance()->addError(100003)->render();
+        }
+
+        $ssoClient = new Client(self::APP_TOKEN);
+        $ssoClient->setAccessToken($authToken);
+        $verification = new Authentication($ssoClient);
+        try {
+            $userId = $verification->verifyToken();
+        } catch (SSOException $e) {
+            $response = APIResponse::getInstance();
+            $response->addData('errorMessage', $e->getMessage());
+            $response->addError(999101)->render(); // TODO
+        }
+
+        return $userId;
     }
 
     public function addError(int $errorCode): APIResponse
@@ -219,9 +203,6 @@ class APIResponse
             die;
         }
         $response = ['data' => null, 'v' => $this->getAPIVersion()];
-        if ($this->isSaveRequest()) {
-            $response['rId'] = $this->getId();
-        }
 
         $returnCode = $this->getResponseCode();
 
@@ -238,8 +219,6 @@ class APIResponse
 
         $this->sendHeaders($returnCode);
         $this->sendResponse($response);
-
-        $this->doSaveRequest($response);
 
         die;
     }
@@ -313,38 +292,6 @@ class APIResponse
         $this->id = $id;
     }
 
-    /**
-     * @return bool
-     */
-    public function isSaveResponse(): bool
-    {
-        return $this->saveResponse;
-    }
-
-    /**
-     * @param bool $saveResponse
-     */
-    public function setSaveResponse(bool $saveResponse): void
-    {
-        $this->saveResponse = $saveResponse;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSaveRequest(): bool
-    {
-        return $this->saveRequest;
-    }
-
-    /**
-     * @param bool $saveRequest
-     */
-    public function setSaveRequest(bool $saveRequest): void
-    {
-        $this->saveRequest = $saveRequest;
-    }
-
     private function getAPIVersion(): string
     {
         $file = __DIR__ . '/../VERSION.vsf';
@@ -406,39 +353,6 @@ class APIResponse
         $this->responseSent = true;
     }
 
-    private function doSaveRequest(array $response)
-    {
-        if ($this->isSaveRequest()) {
-            $requestData = $this->getRawRequestData();
-            $this->censorPassword($requestData);
-            $requestData = json_encode($requestData);
-            $database = Database::getInstance();
-            $database->insert('api_requests', [
-                'id' => $this->getId(),
-                'method' => $_SERVER['REQUEST_METHOD'],
-                'endpoint' => $_SERVER['REQUEST_URI'],
-                'input' => $requestData,
-                'output_data' => $this->saveResponse ? json_encode(
-                    $this->data
-                ) : '- TRUNCATED -',
-                'output_errors' => json_encode($response['errors'] ?? []),
-                'request_time' => $this->startTime->format(
-                    Date::DATETIME_FORMAT_MICRO
-                ),
-                'response_time' => Date::now(Date::DATETIME_FORMAT_MICRO),
-                'sql_count' => $database->getQueryCount(),
-                'session_id' => Authentication::getSessionId(),
-                'url' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
-            ]);
-        }
-    }
-
-    private function censorPassword(array &$requestData): void
-    {
-        if (isset($requestData['password'])) {
-            $requestData['password'] = '** CENSORED **';
-        }
-    }
 
     private function getRequestBody(): array
     {
@@ -504,39 +418,7 @@ class APIResponse
 
     private function sendCORSHeader(): void
     {
-
-        // TODO if ssofrontendonly is set, only allow sso.isleoflan.ch
         header('Access-Control-Allow-Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? '*')); // TODO: sane CORS
-    }
-
-    /**
-     * @return void
-     */
-    private function checkForAppHeader(): void
-    {
-        if (is_null(self::getRequestHeader(App::HEADER_NAME))) {
-            APIResponse::getInstance()->addError(999106)->render();
-        } else {
-            try {
-                new App(self::getRequestHeader(App::HEADER_NAME));
-            } catch (IOLException) {
-                APIResponse::getInstance()->addError(999107)->render();
-            }
-        }
-    }
-
-
-    /**
-     * @param bool|null $ssoFrontendOnly
-     *
-     * @return bool
-     */
-    public function isSsoFrontendOnly(?bool $ssoFrontendOnly = null): bool
-    {
-        if (!is_null($ssoFrontendOnly)) {
-            $this->ssoFrontendOnly = $ssoFrontendOnly;
-        }
-        return $this->ssoFrontendOnly;
     }
 
 

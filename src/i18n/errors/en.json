@@ -1,0 +1,189 @@
+{
+  "100001": {
+    "message": "The specified token has expired",
+    "errorCode": 401
+  },
+  "100002": {
+    "message": "The specified token is invalid",
+    "errorCode": 401
+  },
+  "100003": {
+    "message": "There was no token specified",
+    "errorCode": 401
+  },
+  "100004": {
+    "message": "Request method not allowed",
+    "errorCode": 405
+  },
+
+  "101001": {
+    "message": "Invalid redirection URL",
+    "errorCode": 403
+  },
+  "101002": {
+    "message": "Login Request invalid",
+    "errorCode": 403
+  },
+
+
+  "102001": {
+    "message": "Global Session ID invalid",
+    "errorCode": 403
+  },
+  "102002": {
+    "message": "Global Session ID invalid or expired",
+    "errorCode": 403
+  },
+
+
+  "103001": {
+    "message": "Username invalid",
+    "errorCode": 403
+  },
+  "103002": {
+    "message": "Password invalid",
+    "errorCode": 403
+  },
+  "103003": {
+    "message": "No username / password combination or global session id given",
+    "errorCode": 403
+  },
+
+  "105001": {
+    "message": "Provided E-Mail address is already registered",
+    "errorCode": 403
+  },
+  "105002": {
+    "message": "Provided username is already taken",
+    "errorCode": 403
+  },
+
+  "105101": {
+    "message": "Username is not valid",
+    "errorCode": 403
+  },
+  "105102": {
+    "message": "Password is not valid",
+    "errorCode": 403
+  },
+  "105103": {
+    "message": "Gender is not valid",
+    "errorCode": 403
+  },
+  "105104": {
+    "message": "Forename is not valid",
+    "errorCode": 403
+  },
+  "105105": {
+    "message": "Last name is not valid",
+    "errorCode": 403
+  },
+  "105106": {
+    "message": "Address is not valid",
+    "errorCode": 403
+  },
+  "105107": {
+    "message": "ZIP code is not valid",
+    "errorCode": 403
+  },
+  "105108": {
+    "message": "City is not valid",
+    "errorCode": 403
+  },
+  "105109": {
+    "message": "Birth date is not valid",
+    "errorCode": 403
+  },
+  "105110": {
+    "message": "E-Mail address is not valid",
+    "errorCode": 403
+  },
+  "105111": {
+    "message": "Phone number is not valid",
+    "errorCode": 403
+  },
+
+  "105201": {
+    "message": "Provided confirmation hash is invalid",
+    "errorCode": 404
+  },
+  "105202": {
+    "message": "No Login request was found for this user",
+    "errorCode": 404
+  },
+
+  "201001": {
+    "message": "App ID invalid",
+    "errorCode": 403
+  },
+
+  "301001": {
+    "message": "Invalid Intermediate Token",
+    "errorCode": 403
+  },
+
+  "401001": {
+    "message": "Invalid Refresh Token",
+    "errorCode": 403
+  },
+
+  "501001": {
+    "message": "Invalid Reset Token",
+    "errorCode": 403
+  },
+
+
+
+  "901001": {
+    "message": "Wrong username or password",
+    "errorCode": 403
+  },
+
+  "901002": {
+    "message": "E-Mail address has not been verified yet. A new verification e-mail has been triggered.",
+    "errorCode": 403
+  },
+
+  "901003": {
+    "message": "This user has been blocked",
+    "errorCode": 403
+  },
+
+
+  "999101": {
+    "message": "General Server Error",
+    "errorCode": 500
+  },
+  "999102": {
+    "message": "A SQL Error happened",
+    "errorCode": 500
+  },
+  "999103": {
+    "message": "The SQL server can not be reached",
+    "errorCode": 503
+  },
+  "999104": {
+    "message": "The server threw an unrecoverable error. Please try again later",
+    "errorCode": 503
+  },
+  "999105": {
+    "message": "Cannot read malformed JSON",
+    "errorCode": 503
+  },
+  "999106": {
+    "message": "Required App ID Header missing",
+    "errorCode": 403
+  },
+  "999107": {
+    "message": "App ID invalid",
+    "errorCode": 403
+  },
+  "999999": {
+    "message": "Endpoint not found",
+    "errorCode": 404
+  },
+  "0": {
+    "message": "Undefined error",
+    "errorCode": 500
+  }
+}

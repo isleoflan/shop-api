@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IOL\SSO\v1\Request;
+namespace IOL\Shop\v1\Request;
 
-//use IOL\SSO\v1\DataSource\File;
+use IOL\Shop\v1\DataSource\File;
 use JetBrains\PhpStorm\ArrayShape;
 
 class Error
@@ -39,7 +39,6 @@ class Error
 
     private function lookup(): void
     {
-        return;
         $errorFileBase = File::getBasePath() . '/i18n/errors/';
         $errorLanguage = 'en';
         $errorFile = $errorFileBase . $errorLanguage . '.json';
