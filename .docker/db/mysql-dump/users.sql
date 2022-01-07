@@ -1,0 +1,4 @@
+FLUSH PRIVILEGES;
+CREATE USER 'shop_tester'@'%' IDENTIFIED BY 'Akhy9T2xXugtXCzL';
+GRANT ALL PRIVILEGES ON * . * TO 'shop_tester'@'%';
+FLUSH PRIVILEGES;

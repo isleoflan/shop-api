@@ -1,0 +1,15 @@
+{
+  "name": "isleoflan/shop-api",
+  "description": "description",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "stui",
+      "email": "stui@isleoflan.ch"
+    }
+  ],
+  "require": {
+    "isleoflan/iol-sso-library": "*"
+  }
+}
