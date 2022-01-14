@@ -14,7 +14,7 @@
 
         private string $id;
         private Category $category;
-        private string $number;
+        private ?string $number;
         private string $title;
         private string $description;
         private int $price;
@@ -45,7 +45,7 @@
 
             $this->id = $values['id'];
             $this->category = new Category($values['category_id']);
-            $this->number = $values['number'];
+            $this->number = $values['product_number'];
             $this->title = $values['title'];
             $this->description = $values['description'];
             $this->price = $values['price'];
