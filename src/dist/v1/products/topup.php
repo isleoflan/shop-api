@@ -18,12 +18,7 @@
 
     foreach($category->getProducts() as $product){
         $data = [
-            'id' => $product->getId(),
-            'title' => $product->getTitle(),
-            'dateFrom' => $product->getAdditionalData()['dateFrom'],
-            'dateTo' => $product->getAdditionalData()['dateTo'],
-            'location' => $product->getAdditionalData()['location'],
-            'price' => $product->getPrice(),
+            'topUpId' => $product->getId(),
         ];
 
         $response->setData($data);

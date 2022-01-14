@@ -21,11 +21,24 @@
         $data[] = [
             'id' => $product->getId(),
             'title' => $product->getTitle(),
-            'dateFrom' => $product->getAdditionalData()['dateFrom'],
-            'dateTo' => $product->getAdditionalData()['dateTo'],
-            'location' => $product->getAdditionalData()['location'],
+            'description' => $product->getDescription(),
+            'date' => $product->getAdditionalData()['date'],
             'price' => $product->getPrice(),
         ];
     }
 
-    $response->setData($data);
+    $response->addData('menus', $data);
+
+
+    $specialDealCategory = new \IOL\Shop\v1\Entity\Category(5);
+    $specialDealCategory->loadProducts();
+
+    foreach($specialDealCategory->getProducts() as $product){
+        $specialDealData = [
+            'id' => $product->getId(),
+            'title' => $product->getTitle(),
+            'description' => $product->getDescription(),
+            'price' => $product->getPrice(),
+        ];
+    }
+    $response->addData('specialDeal', $specialDealData);
