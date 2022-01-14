@@ -24,7 +24,7 @@ class MysqliDb
      *
      * @var MysqliDb
      */
-    protected static ?\IOL\SSO\v1\DataSource\Database $instance;
+    protected static ?\IOL\Shop\v1\DataSource\Database $instance;
 
     /**
      * Table prefix

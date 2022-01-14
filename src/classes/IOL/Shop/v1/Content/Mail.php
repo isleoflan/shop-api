@@ -15,7 +15,7 @@
         private array $variables = [];
 
         /**
-         * @param \IOL\SSO\v1\DataType\Email $receiver
+         * @param \IOL\Shop\v1\DataType\Email $receiver
          */
         public function setReceiver(Email $receiver): void
         {
@@ -72,7 +72,7 @@
         }
 
         #[ArrayShape([
-            'receiver'    => "\IOL\SSO\v1\DataType\Email",
+            'receiver'    => "\IOL\Shop\v1\DataType\Email",
             'subject'     => "string",
             'attachments' => "array",
             'template'    => "string",
@@ -90,7 +90,7 @@
         }
 
         #[Pure] #[ArrayShape([
-            'receiver'    => "\IOL\SSO\v1\DataType\Email",
+            'receiver'    => "\IOL\Shop\v1\DataType\Email",
             'subject'     => "string",
             'attachments' => "array",
             'template'    => "string",

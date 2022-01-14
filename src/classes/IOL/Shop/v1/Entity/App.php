@@ -24,7 +24,7 @@ class App implements \JsonSerializable
 
     /**
      * @throws NotFoundException
-     * @throws \IOL\SSO\v1\Exceptions\InvalidValueException
+     * @throws \IOL\Shop\v1\Exceptions\InvalidValueException
      */
     public function __construct(?string $id = null)
     {
