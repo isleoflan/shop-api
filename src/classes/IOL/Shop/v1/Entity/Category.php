@@ -44,7 +44,7 @@
         {
             $database = \IOL\Shop\v1\DataSource\Database::getInstance();
 
-            $data = $database->query('SELECT * FROM ' . self::DB_TABLE . ' WHERE category_id = ' . $this->id . ' AND 
+            $data = $database->query('SELECT * FROM ' . Product::DB_TABLE . ' WHERE category_id = ' . $this->id . ' AND 
             (show_from <= NOW() OR show_from IS NULL) AND (show_until >= NOW() OR show_until IS NULL)
             ORDER BY sort ASC');
 
