@@ -16,11 +16,11 @@
         private Category $category;
         private ?string $number;
         private string $title;
-        private string $description;
+        private ?string $description;
         private int $price;
-        private Date $showFrom;
-        private Date $showUntil;
-        private array $additionalData;
+        private ?Date $showFrom;
+        private ?Date $showUntil;
+        private ?array $additionalData;
         private int $sort;
 
         /**

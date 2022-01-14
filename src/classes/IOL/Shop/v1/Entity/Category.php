@@ -45,6 +45,7 @@
             $database = \IOL\Shop\v1\DataSource\Database::getInstance();
             $database->where('category_id', $this->id);
             $database->where('show_from','NOW()','<=');
+            $database->where('show_from',NULL,'IS', 'OR');
             $database->where('show_until','NOW()','>=');
             $database->where('show_until',NULL,'IS', 'OR');
             $database->orderBy('sort', 'ASC');
