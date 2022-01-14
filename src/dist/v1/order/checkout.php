@@ -12,12 +12,24 @@
     );
     $response->needsAuth(true);
 
-    $response->check();
+    $userID = $response->check();
     $input = $response->getRequestData([
-       [
-           'name'      => 'token',
-           'types'     => ['string'],
-           'required'  => true,
-           'errorCode' => 301001,
-       ],
+                                           [
+                                               'name'      => 'user',
+                                               'types'     => ['array'],
+                                               'required'  => true,
+                                               'errorCode' => 301001,
+                                           ],
+                                           [
+                                               'name'      => 'cart',
+                                               'types'     => ['array'],
+                                               'required'  => true,
+                                               'errorCode' => 301001,
+                                           ],
+                                           [
+                                               'name'      => 'paymentType',
+                                               'types'     => ['string'],
+                                               'required'  => true,
+                                               'errorCode' => 301001,
+                                           ],
    ]);
