@@ -43,14 +43,10 @@
         public function loadProducts()
         {
             $database = \IOL\Shop\v1\DataSource\Database::getInstance();
-            $database->where('category_id', $this->id);
-            $database->where('show_from','NOW()','<=');
-            $database->where('show_from',NULL,'IS', 'OR');
-            $database->where('show_until','NOW()','>=');
-            $database->where('show_until',NULL,'IS', 'OR');
-            $database->orderBy('sort', 'ASC');
 
-            $data = $database->get(Product::DB_TABLE);
+            $data = $database->query('SELECT * FROM ' . self::DB_TABLE . ' WHERE category_id = ' . $this->id . ' AND 
+            (show_from <= NOW() OR show_from IS NULL) AND (show_until >= NOW() OR show_until IS NULL)
+            ORDER BY sort ASC');
 
             foreach($data as $productData){
                 $product = new Product();
