@@ -49,8 +49,8 @@
             $this->title = $values['title'];
             $this->description = $values['description'];
             $this->price = $values['price'];
-            $this->showFrom = new Date($values['show_from']);
-            $this->showUntil = new Date($values['show_until']);
+            $this->showFrom = is_null($values['show_from']) ? null : new Date($values['show_from']);
+            $this->showUntil = is_null($values['show_until']) ? null : new Date($values['show_until']);
             $this->additionalData = json_decode($values['additional_data'], true);
             $this->sort = $values['sort'];
         }
