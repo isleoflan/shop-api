@@ -26,5 +26,5 @@
             'price' => $product->getPrice(),
         ];
 
-        $response->setData($data);
+        $response->setData([$data]);
     }
