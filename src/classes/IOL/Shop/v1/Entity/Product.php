@@ -7,6 +7,7 @@
     use IOL\Shop\v1\DataType\UUID;
     use IOL\Shop\v1\Exceptions\InvalidValueException;
     use IOL\Shop\v1\Exceptions\NotFoundException;
+    use JetBrains\PhpStorm\Pure;
 
     class Product
     {
@@ -21,6 +22,7 @@
         private ?Date $showFrom;
         private ?Date $showUntil;
         private ?array $additionalData;
+        private array $media = [];
         private int $sort;
 
         /**
@@ -53,6 +55,39 @@
             $this->showUntil = is_null($values['show_until']) ? null : new Date($values['show_until']);
             $this->additionalData = json_decode($values['additional_data'], true);
             $this->sort = $values['sort'];
+
+            $this->loadMedia();
+        }
+
+        public function loadMedia(): void
+        {
+            $database = Database::getInstance();
+            $database->where('product_id', $this->id);
+            $database->orderBy('sort');
+            $data = $database->get(ProductMedium::DB_TABLE, [0, 1]);
+            foreach($data as $medium){
+                $productMedium = new ProductMedium();
+                $productMedium->loadData($medium);
+                $this->media[] = $productMedium;
+            }
+        }
+
+        #[Pure]
+        public function getImages(): array
+        {
+            $return = [];
+            /** @var ProductMedium $medium */
+            foreach($this->media as $medium){
+                if($medium->getType() == 'IMAGE') {
+                    $return[] = $medium->getValue();
+                }
+            }
+            return $return;
+        }
+
+        public function getVariants(): array
+        {
+            return []; //TODO
         }
 
         /**
