@@ -11,6 +11,7 @@
     class ProductMedium
     {
         public const DB_TABLE = 'product_media';
+        public const BASE_URL = 'https://cdn.isleoflan.ch/shop/';
 
         private string $id;
         private Product $product;
@@ -39,10 +40,15 @@
             }
 
             $this->id = $values['id'];
-            $this->product = new Product($values['product_id']);
+            //$this->product = new Product($values['product_id']);
             $this->type = $values['medium_type'];
             $this->value = $values['medium_value'];
             $this->sort = $values['sort'];
+        }
+
+        public function getUrl(): string
+        {
+            return self::BASE_URL.$this->getValue();
         }
 
         /**

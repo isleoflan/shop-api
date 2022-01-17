@@ -79,7 +79,7 @@
             /** @var ProductMedium $medium */
             foreach($this->media as $medium){
                 if($medium->getType() == 'IMAGE') {
-                    $return[] = $medium->getValue();
+                    $return[] = $medium->getUrl();
                 }
             }
             return $return;
