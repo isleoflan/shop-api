@@ -63,7 +63,7 @@ class Order
             'id' => $this->id,
             'user_id' => $this->userId,
             'created' => $this->created->format(Date::DATETIME_FORMAT_MICRO),
-            'payment_method' => $this->paymentMethod
+            'payment_method' => $this->paymentMethod->getValue()
         ]);
 
         $total = 0;
