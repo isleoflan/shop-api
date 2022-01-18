@@ -133,6 +133,65 @@
   },
 
 
+  "601001": {
+    "message": "Field gender missing or invalid",
+    "errorCode": 400
+  },
+  "601002": {
+    "message": "Field forename missing or invalid",
+    "errorCode": 400
+  },
+  "601003": {
+    "message": "Field lastname missing or invalid",
+    "errorCode": 400
+  },
+  "601004": {
+    "message": "Field mail missing or invalid",
+    "errorCode": 400
+  },
+  "601005": {
+    "message": "Field street missing or invalid",
+    "errorCode": 400
+  },
+  "601006": {
+    "message": "Field zipCode missing or invalid",
+    "errorCode": 400
+  },
+  "601007": {
+    "message": "Field city missing or invalid",
+    "errorCode": 400
+  },
+  "601008": {
+    "message": "Field id for cart item missing or invalid",
+    "errorCode": 400
+  },
+  "601009": {
+    "message": "Field amount for cart item missing or invalid",
+    "errorCode": 400
+  },
+  "601010": {
+    "message": "Field variant for cart item missing or invalid",
+    "errorCode": 400
+  },
+  "602001": {
+    "message": "Invalid Product",
+    "errorCode": 404
+  },
+
+  "601101": {
+    "message": "Field user missing or invalid",
+    "errorCode": 400
+  },
+  "601102": {
+    "message": "Field cart missing or invalid",
+    "errorCode": 400
+  },
+  "601103": {
+    "message": "Field paymentType missing or invalid",
+    "errorCode": 400
+  },
+
+
 
   "901001": {
     "message": "Wrong username or password",

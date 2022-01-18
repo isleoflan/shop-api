@@ -97,6 +97,8 @@ class APIResponse
      */
     private ?array $data = null;
 
+    public static string $userId;
+
     /**
      * sets the start time and searches for a new, unused UUID to use as the request
      * ID. If you don't intend to use the request saving as a debug tool, you can safely disable this.
@@ -150,7 +152,7 @@ class APIResponse
         }
 
         if ($this->authRequired) {
-            return self::getAuthToken();
+            return self::verifyAuth();
         }
 
         return null;
@@ -170,18 +172,24 @@ class APIResponse
             APIResponse::getInstance()->addError(100003)->render();
         }
 
+        return $authToken;
+    }
+    public static function verifyAuth(): string
+    {
+        $authToken = self::getAuthToken();
+
         $ssoClient = new Client(self::APP_TOKEN);
         $ssoClient->setAccessToken($authToken);
         $verification = new Authentication($ssoClient);
+        $response = APIResponse::getInstance();
         try {
-            $userId = $verification->verifyToken();
+            $response::$userId = $verification->verifyToken();
         } catch (SSOException $e) {
-            $response = APIResponse::getInstance();
             $response->addData('errorMessage', $e->getMessage());
             $response->addError(999101)->render(); // TODO
         }
 
-        return $userId;
+        return $response::$userId;
     }
 
     public function addError(int $errorCode): APIResponse
@@ -197,7 +205,7 @@ class APIResponse
     }
 
     #[NoReturn]
-    public function render(): void//never
+    public function render(): never
     {
         if ($this->responseSent) {
             die;

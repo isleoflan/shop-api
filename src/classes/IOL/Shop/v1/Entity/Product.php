@@ -17,7 +17,9 @@
         private Category $category;
         private ?string $number;
         private string $title;
+        private string $paymentTitle;
         private ?string $description;
+        private ?string $paymentDescription;
         private int $price;
         private ?Date $showFrom;
         private ?Date $showUntil;
@@ -49,7 +51,9 @@
             $this->category = new Category($values['category_id']);
             $this->number = $values['product_number'];
             $this->title = $values['title'];
+            $this->paymentTitle = $values['payment_title'];
             $this->description = $values['description'];
+            $this->paymentDescription = $values['payment_description'];
             $this->price = $values['price'];
             $this->showFrom = is_null($values['show_from']) ? null : new Date($values['show_from']);
             $this->showUntil = is_null($values['show_until']) ? null : new Date($values['show_until']);
@@ -136,6 +140,22 @@
         public function getSort(): int
         {
             return $this->sort;
+        }
+
+        /**
+         * @return string
+         */
+        public function getPaymentTitle(): string
+        {
+            return $this->paymentTitle;
+        }
+
+        /**
+         * @return string|null
+         */
+        public function getPaymentDescription(): ?string
+        {
+            return $this->paymentDescription;
         }
 
     }
