@@ -38,7 +38,7 @@ $input = $response->getRequestData([
 foreach (
     [
         'gender' => 601001,
-        'forname' => 601002,
+        'forename' => 601002,
         'lastname' => 601003,
         'mail' => 601004,
         'street' => 601005,
