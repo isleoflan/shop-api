@@ -158,4 +158,12 @@
             return $this->paymentDescription;
         }
 
+        /**
+         * @return Category
+         */
+        public function getCategory(): Category
+        {
+            return $this->category;
+        }
+
     }

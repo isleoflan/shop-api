@@ -72,5 +72,13 @@ class Category
         return $this->products;
     }
 
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
 
 }
