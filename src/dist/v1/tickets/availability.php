@@ -15,7 +15,7 @@ $response->needsAuth(false);
 
 $response->setData([
     'total' => 80,
-    'sold' => 0,
-    'reserved' => 0,
-    'free' => 0,
+    'sold' => 34,
+    'reserved' => 8,
+    'free' => 38,
 ]);
