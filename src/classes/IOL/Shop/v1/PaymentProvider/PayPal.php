@@ -10,6 +10,7 @@ use IOL\Shop\v1\Entity\OrderItem;
 use IOL\Shop\v1\Request\APIResponse;
 use IOL\SSO\SDK\Client;
 use IOL\SSO\SDK\Service\User;
+use PayPal\Exception\PayPalConnectionException;
 
 class PayPal extends PaymentProvider implements PaymentProviderInterface
 {
@@ -110,19 +111,17 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
         $payment->setRedirectUrls($redirectUrls);
 
 
-        //try {
+        try {
             $payment->create($apiContext);
             $this->redirect = $payment->getApprovalLink();
 
             return $payment->id;
 
-        //} catch(\Exception $e){
-        //    $return_data['status'] = 'error';
-        //    $return_data['data'] = array('errorid' => 9286);
-        //    $return_data['message'] = '';
+        } catch(PayPalConnectionException $e){
+            var_dump($e->getData());
 
             // TODO
-        //}
-        //return '';
+        }
+        return '';
     }
 }
