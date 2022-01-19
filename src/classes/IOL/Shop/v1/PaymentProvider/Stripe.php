@@ -54,7 +54,8 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
         $ssoClient = new Client(APIResponse::APP_TOKEN);
         $ssoClient->setAccessToken(APIResponse::getAuthToken());
         $user = new User($ssoClient);
-        $user = $user['response']['data'];
+        $userData = $user->getUserInfo();
+        $userData = $user['response']['data'];
 
         \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET'));
 
@@ -62,7 +63,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
             'payment_method_types' => ['card'],
             'client_reference_id' => $order->getId(),
             'line_items' => [$items],
-            'customer_email' => $user['email'],
+            'customer_email' => $userData['email'],
             'success_url' => Environment::get('SUCCESS_URL').'?stsid={CHECKOUT_SESSION_ID}&oid='.$order->getId(),
             'cancel_url' => Environment::get('CANCEL_URL').'?oid='.$order->getId(),
         ]);
