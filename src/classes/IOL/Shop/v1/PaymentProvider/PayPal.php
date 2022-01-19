@@ -66,15 +66,6 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
             $items[] = $item;
         }
 
-
-        if($order->hasValidVoucher()){
-            $item = new \PayPal\Api\Item();
-            $item->setName('Rabattcode');
-            $item->setCurrency('CHF');
-            $item->setQuantity(1);
-            $item->setPrice(number_format((($order->getVoucher()->getValue() * -1)) / 100,2,".",''));
-        }
-
         $item = new \PayPal\Api\Item();
         $item->setName('Zahlungsart Aufschlag');
         $item->setDescription('Aufschlag für Online-Zahlung');
@@ -91,6 +82,10 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
 
         $details = new \PayPal\Api\Details();
         $details->setSubtotal(number_format(($order->getTotal() + $order->getFees()) / 100,2,".",''));
+
+        if($order->hasValidVoucher()) {
+            $details->setShippingDiscount(number_format((($order->getVoucher()->getValue() * -1)) / 100, 2, ".", ''));
+        }
 
 
 
