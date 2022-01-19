@@ -116,19 +116,19 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
         $payment->setRedirectUrls($redirectUrls);
 
 
-        try {
+        //try {
             $payment->create($apiContext);
             $this->redirect = $payment->getApprovalLink();
 
             return $payment->id;
 
-        } catch(\Exception $e){
-            $return_data['status'] = 'error';
-            $return_data['data'] = array('errorid' => 9286);
-            $return_data['message'] = '';
+        //} catch(\Exception $e){
+        //    $return_data['status'] = 'error';
+        //    $return_data['data'] = array('errorid' => 9286);
+        //    $return_data['message'] = '';
 
             // TODO
-        }
-        return '';
+        //}
+        //return '';
     }
 }

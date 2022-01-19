@@ -44,15 +44,6 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
             $items[] = $tempItems;
         }
 
-        if($order->hasValidVoucher()){
-            $items[] = [
-                'name' => 'Rabattcode',
-                'description' => 'Eingelöster Rabattcode: '.$order->getVoucher()->getCode(),
-                'amount' => ($order->getVoucher()->getValue() * -1),
-                'currency' => 'chf',
-                'quantity' => 1
-            ];
-        }
 
         $surcharge = $order->getFees();
 
@@ -72,14 +63,20 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
 
         \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET'));
 
-        $this->session = \Stripe\Checkout\Session::create([
+        $payload = [
             'payment_method_types' => ['card'],
             'client_reference_id' => $order->getId(),
             'line_items' => [$items],
             'customer_email' => $userData['email'],
             'success_url' => Environment::get('SUCCESS_URL').'?stsid={CHECKOUT_SESSION_ID}&oid='.$order->getId(),
             'cancel_url' => Environment::get('CANCEL_URL').'?oid='.$order->getId(),
-        ]);
+        ];
+
+        if($order->hasValidVoucher()){
+            $payload['discounts'] = [['coupon' => $order->getVoucher()->getCode()]];
+        }
+
+        $this->session = \Stripe\Checkout\Session::create($payload);
 
         return $this->session->id;
     }
