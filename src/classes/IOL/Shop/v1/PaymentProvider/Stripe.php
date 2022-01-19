@@ -20,7 +20,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
 
     private Session $session;
 
-    public function getPaymentLink(): ?string
+    public function getPaymentLink(): string
     {
         return $this->session->url;
     }

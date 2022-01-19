@@ -18,7 +18,7 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
 
     private string $redirect;
 
-    public function getPaymentLink(): ?string
+    public function getPaymentLink(): string
     {
         return $this->redirect;
     }

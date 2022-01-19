@@ -16,7 +16,7 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
 
     private string $id;
 
-    public function getPaymentLink(): ?string
+    public function getPaymentLink(): string
     {
         return 'https://commerce.coinbase.com/checkout/'.$this->id;
     }
