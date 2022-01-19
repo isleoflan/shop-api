@@ -33,9 +33,9 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
         foreach($order->getItems() as $item) {
             $tempItems = [
                 'name' => $item->getProduct()->getPaymentTitle(),
-                'amount' => $item->getProduct()->getCategory()->getId() == 5 ? $item->getPrice() :$item->getProduct()->getPrice(),
+                'amount' => $item->getProduct()->getCategory()->getId() == 3 ? $item->getPrice() :$item->getProduct()->getPrice(),
                 'currency' => 'chf',
-                'quantity' => $item->getProduct()->getCategory()->getId() == 5 ? 1 :$item->getAmount()
+                'quantity' => $item->getProduct()->getCategory()->getId() == 3 ? 1 :$item->getAmount()
             ];
             if ($item->getProduct()->getPaymentDescription() != '') {
                 $tempItems['description'] = $item->getProduct()->getPaymentDescription();
