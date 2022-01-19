@@ -14,9 +14,11 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
     public int $fixedFee = 0;
     public float $variableFee = 0;
 
+    private string $id;
+
     public function getPaymentLink(): ?string
     {
-        return '';
+        return 'https://commerce.coinbase.com/checkout/'.$this->id;
     }
 
     public function createPayment(Order $order): string
@@ -28,16 +30,15 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
             'description' => 'Bestell-Nr. '.$order->getId(),
             'pricing_type' => 'fixed_price',
             'local_price' => [
-                'amount' => number_format(($order->getTotal() + $order->getFees()), 2, '.', ''),
+                'amount' => number_format(($order->getTotal() + $order->getFees()) / 100, 2, '.', ''),
                 'currency' => 'CHF'
             ],
             'requested_info' => ['name', 'email']
         ];
         $newCheckoutObj = Checkout::create($checkoutData);
+        $this->id = $newCheckoutObj->getAttribute('id');
 
-        var_dump($newCheckoutObj);
-
-        return '';
+        return $this->id;
     }
 
     public function initializeDocuments(Order $order): void
