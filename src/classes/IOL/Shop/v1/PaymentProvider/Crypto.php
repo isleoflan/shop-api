@@ -33,7 +33,7 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
                 'amount' => number_format(($order->getTotal() + $order->getFees()) / 100, 2, '.', ''),
                 'currency' => 'CHF'
             ],
-            'requested_info' => ['name', 'email']
+            'requested_info' => []
         ];
         $newCheckoutObj = Checkout::create($checkoutData);
         $this->id = $newCheckoutObj->getAttribute('id');
