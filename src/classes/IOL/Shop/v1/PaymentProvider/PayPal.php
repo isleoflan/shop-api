@@ -61,7 +61,7 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
             $item->setCurrency('CHF');
             $item->setQuantity($tempItem->getProduct()->getCategory()->getId() == 3 ? 1 : $tempItem->getAmount());
             //$item->setSku($i->getProduct()->getId());
-            $item->setPrice(number_format(($tempItem->getProduct()->getCategory()->getId() == 3 ? $tempItem->getPrice() : $tempItem->getPrice()),2,".","'"));
+            $item->setPrice(number_format(($tempItem->getProduct()->getCategory()->getId() == 3 ? $tempItem->getPrice() : $tempItem->getProduct()->getPrice()),2,".",''));
 
             $items[] = $item;
         }
@@ -71,7 +71,7 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
         $item->setDescription("Aufschlag für Online-Zahlung");
         $item->setCurrency('CHF');
         $item->setQuantity(1);
-        $item->setPrice(number_format($order->getFees(),2,".","'"));
+        $item->setPrice(number_format($order->getFees(),2,".",''));
 
         $items[] = $item;
 
@@ -81,12 +81,12 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
 
 
         $details = new \PayPal\Api\Details();
-        $details->setSubtotal(number_format($order->getTotal() + $order->getFees(),2,".","'"));
+        $details->setSubtotal(number_format($order->getTotal() + $order->getFees(),2,".",''));
 
 
 
         $amount = new \PayPal\Api\Amount();
-        $amount->setTotal(number_format($order->getTotal() + $order->getFees(),2,".","'"));
+        $amount->setTotal(number_format($order->getTotal() + $order->getFees(),2,".",''));
         $amount->setCurrency('CHF');
         $amount->setDetails($details);
 
