@@ -8,7 +8,7 @@ class PaymentProvider
 {
     public function getFees(int $total): int
     {
-        return ceil((($total * $this->variableFee) + $this->fixedFee) / 50) * 50;
+        return (int)(ceil((($total * $this->variableFee) + $this->fixedFee) / 50) * 50);
     }
 
 }

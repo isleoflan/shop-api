@@ -76,30 +76,30 @@ class Order
         }
 
 
-        switch($this->paymentMethod){
+        switch($this->paymentMethod->getValue()){
             case PaymentMethod::PREPAYMENT:
-                $paymentMethod = new Prepayment();
+                $paymentProvider = new Prepayment();
                 break;
             case PaymentMethod::STRIPE:
-                $paymentMethod = new Stripe();
+                $paymentProvider = new Stripe();
                 break;
             case PaymentMethod::PAYPAL:
-                $paymentMethod = new PayPal();
+                $paymentProvider = new PayPal();
                 break;
             case PaymentMethod::CRYPTO:
-                $paymentMethod = new Crypto();
+                $paymentProvider = new Crypto();
                 break;
         }
 
-        $externalId = $paymentMethod->createPayment($this);
-        $redirect = $paymentMethod->getPaymentLink();
+        $externalId = $paymentProvider->createPayment($this);
+        $redirect = $paymentProvider->getPaymentLink();
 
         $invoice = new Invoice();
         $invoice->createNew($this, $externalId);
 
 
 
-        $paymentMethod->initializeDocuments($this);
+        $paymentProvider->initializeDocuments($this);
         return $redirect;
     }
 
