@@ -40,7 +40,7 @@ foreach (
         'gender' => 601001,
         'forename' => 601002,
         'lastname' => 601003,
-        'mail' => 601004,
+        'email' => 601004,
         'street' => 601005,
         'zipCode' => 601006,
         'city' => 601007,
