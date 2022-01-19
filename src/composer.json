@@ -13,7 +13,7 @@
     "isleoflan/iol-sso-library": "*",
     "stripe/stripe-php": "^7.14",
     "paypal/rest-api-sdk-php": "^1.14",
-    "coinbase/coinbase-commerce": "^1.0",
+    "mvjacobs/coinbase-commerce": "*",
     "vlucas/phpdotenv": "^5.3"
   }
 }
