@@ -64,6 +64,18 @@ class Order
         $this->voucher = $voucher;
         $this->orderStatus = new OrderStatus(OrderStatus::CREATED);
 
+
+        foreach($items as $sort => $item){
+            $orderItem = new OrderItem();
+            $orderItem->createNew($this->id, $item, $sort);
+
+            $this->items[] = $orderItem;
+        }
+
+        if($this->getTotal() === 0){
+            $this->paymentMethod = new PaymentMethod(PaymentMethod::PREPAYMENT);
+        }
+
         $database = Database::getInstance();
         $database->insert(self::DB_TABLE, [
             'id' => $this->id,
@@ -73,14 +85,6 @@ class Order
             'voucher' => is_null($this->voucher) ? null : $this->voucher->getCode(),
             'status' => $this->orderStatus->getValue()
         ]);
-
-        foreach($items as $sort => $item){
-            $orderItem = new OrderItem();
-            $orderItem->createNew($this->id, $item, $sort);
-
-            $this->items[] = $orderItem;
-        }
-
 
         switch($this->paymentMethod->getValue()){
             case PaymentMethod::PREPAYMENT:
