@@ -55,7 +55,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
         $ssoClient->setAccessToken(APIResponse::getAuthToken());
         $user = new User($ssoClient);
         $userData = $user->getUserInfo();
-        $userData = $user['response']['data'];
+        $userData = $userData['response']['data'];
 
         \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET'));
 
