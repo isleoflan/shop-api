@@ -114,7 +114,7 @@ class Order
 
     public function getFees(): int
     {
-        switch($this->paymentMethod){
+        switch($this->paymentMethod->getValue()){
             case PaymentMethod::PREPAYMENT:
                 $paymentMethod = new Prepayment();
                 break;
