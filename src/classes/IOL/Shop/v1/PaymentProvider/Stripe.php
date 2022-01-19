@@ -47,7 +47,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
         if($order->hasValidVoucher()){
             $items[] = [
                 'name' => 'Rabattcode',
-                'description' => '',
+                'description' => 'Eingelöster Rabattcode: '.$order->getVoucher()->getCode(),
                 'amount' => ($order->getVoucher()->getValue() * -1),
                 'currency' => 'chf',
                 'quantity' => 1
