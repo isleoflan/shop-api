@@ -52,11 +52,11 @@ class Invoice
 
         $database = Database::getInstance();
         $database->insert(self::DB_TABLE, [
-            'id'        => $this->id,
-            'order_id'  => $this->order->getId(),
-            'created'   => $this->created->format(Date::DATETIME_FORMAT_MICRO),
-            'externalId'=> $this->externalId,
-            'value'     => $this->value
+            'id'            => $this->id,
+            'order_id'      => $this->order->getId(),
+            'created'       => $this->created->format(Date::DATETIME_FORMAT_MICRO),
+            'external_id'   => $this->externalId,
+            'value'         => $this->value
         ]);
     }
 }
