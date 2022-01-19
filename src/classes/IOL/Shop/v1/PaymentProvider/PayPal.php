@@ -84,7 +84,7 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
         $details->setSubtotal(number_format(($order->getTotal() + $order->getFees()) / 100,2,".",''));
 
         if($order->hasValidVoucher()) {
-            $details->setShippingDiscount(number_format((($order->getVoucher()->getValue() * -1)) / 100, 2, ".", ''));
+            $details->setShippingDiscount(number_format(($order->getVoucher()->getValue()) / 100, 2, ".", ''));
         }
 
 
