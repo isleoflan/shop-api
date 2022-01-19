@@ -11,15 +11,18 @@ use IOL\Shop\v1\Request\APIResponse;
 use IOL\SSO\SDK\Client;
 use IOL\SSO\SDK\Service\Authentication;
 use IOL\SSO\SDK\Service\User;
+use Stripe\Checkout\Session;
 
 class Stripe extends PaymentProvider implements PaymentProviderInterface
 {
     public int $fixedFee = 30;
     public float $variableFee = 0.029;
 
+    private Session $session;
+
     public function getPaymentLink(): ?string
     {
-        return '';
+        return $this->session->url;
     }
 
     public function createPayment(Order $order): string
@@ -59,7 +62,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
 
         \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET'));
 
-        $session = \Stripe\Checkout\Session::create([
+        $this->session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
             'client_reference_id' => $order->getId(),
             'line_items' => [$items],
@@ -68,7 +71,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
             'cancel_url' => Environment::get('CANCEL_URL').'?oid='.$order->getId(),
         ]);
 
-        return $session->id;
+        return $this->session->id;
     }
 
     public function initializeDocuments(Order $order): void

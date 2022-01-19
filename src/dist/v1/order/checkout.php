@@ -80,4 +80,6 @@ if ($response->hasErrors()) {
 
 
 $order = new \IOL\Shop\v1\Entity\Order();
-$order->createNew($userID, $input['cart'], $paymentMethod);
+$redirect = $order->createNew($userID, $input['cart'], $paymentMethod);
+
+$response->addData('redirect', $redirect);
