@@ -35,6 +35,6 @@ if(isset($input['voucher']) && $input['voucher'] !== ''){
         $response->addError(601105)->render();
     }
 
-    $response->addData('discount', $voucher->getValue());
+    $response->addData('discount', ($voucher->getValue() * -1));
 }
 
