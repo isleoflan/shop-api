@@ -190,6 +190,14 @@
     "message": "Field paymentType missing or invalid",
     "errorCode": 400
   },
+  "601104": {
+    "message": "Invalid voucher",
+    "errorCode": 400
+  },
+  "601105": {
+    "message": "Voucher has already been used",
+    "errorCode": 400
+  },
 
 
 

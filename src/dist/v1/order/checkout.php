@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use IOL\Shop\v1\BitMasks\RequestMethod;
+use IOL\Shop\v1\Entity\Voucher;
 use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Request\APIResponse;
 
@@ -32,6 +33,12 @@ $input = $response->getRequestData([
         'types' => ['string'],
         'required' => true,
         'errorCode' => 601103,
+    ],
+    [
+        'name' => 'voucher',
+        'types' => ['string'],
+        'required' => false,
+        'errorCode' => 601104,
     ],
 ]);
 
@@ -76,10 +83,13 @@ if ($response->hasErrors()) {
 
 
 // TODO: update user data via SSO API
-
+$voucher = null;
+if(isset($input['voucher']) && $input['voucher'] !== ''){
+    $voucher = new Voucher($input['voucher']);
+}
 
 
 $order = new \IOL\Shop\v1\Entity\Order();
-$redirect = $order->createNew($userID, $input['cart'], $paymentMethod);
+$redirect = $order->createNew($userID, $input['cart'], $paymentMethod, $voucher);
 
 $response->addData('redirect', $redirect);

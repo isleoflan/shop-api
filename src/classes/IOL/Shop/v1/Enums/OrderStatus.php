@@ -6,8 +6,7 @@ namespace IOL\Shop\v1\Enums;
 
 class OrderStatus extends Enum
 {
-    public const ALL_ORDER = 'iol.shop.order.*';
-    public const NEW_ORDER = 'iol.shop.order.new';
-
-    public const MAILER = 'iol.mailer';
+    public const CREATED = 'CREATED';
+    public const PAYED = 'PAYED';
+    public const FINISHED = 'FINISHED';
 }

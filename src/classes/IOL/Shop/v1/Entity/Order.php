@@ -7,6 +7,7 @@ namespace IOL\Shop\v1\Entity;
 use IOL\Shop\v1\DataSource\Database;
 use IOL\Shop\v1\DataType\Date;
 use IOL\Shop\v1\DataType\UUID;
+use IOL\Shop\v1\Enums\OrderStatus;
 use IOL\Shop\v1\Enums\PaymentMethod;
 use IOL\Shop\v1\Exceptions\InvalidValueException;
 use IOL\Shop\v1\Exceptions\IOLException;
@@ -16,6 +17,7 @@ use IOL\Shop\v1\PaymentProvider\PayPal;
 use IOL\Shop\v1\PaymentProvider\Prepayment;
 use IOL\Shop\v1\PaymentProvider\Stripe;
 use IOL\Shop\v1\Request\APIResponse;
+use JetBrains\PhpStorm\Pure;
 
 class Order
 {
@@ -25,6 +27,8 @@ class Order
     private string $userId;
     private Date $created;
     private PaymentMethod $paymentMethod;
+    private ?Voucher $voucher = null;
+    private OrderStatus $orderStatus;
 
     private array $items = [];
 
@@ -51,22 +55,24 @@ class Order
         $this->paymentMethod = new PaymentMethod($values['payment_method']);
     }
 
-    public function createNew(string $userId, array $items, PaymentMethod $paymentMethod): string
+    public function createNew(string $userId, array $items, PaymentMethod $paymentMethod, ?Voucher $voucher): string
     {
         $this->id = UUID::newId(self::DB_TABLE);
         $this->userId = $userId;
         $this->created = new Date('u');
         $this->paymentMethod = $paymentMethod;
+        $this->voucher = $voucher;
+        $this->orderStatus = new OrderStatus(OrderStatus::CREATED);
 
         $database = Database::getInstance();
         $database->insert(self::DB_TABLE, [
             'id' => $this->id,
             'user_id' => $this->userId,
             'created' => $this->created->format(Date::DATETIME_FORMAT_MICRO),
-            'payment_method' => $this->paymentMethod->getValue()
+            'payment_method' => $this->paymentMethod->getValue(),
+            'voucher' => is_null($this->voucher) ? null : $this->voucher->getCode(),
+            'status' => $this->orderStatus->getValue()
         ]);
-
-        $total = 0;
 
         foreach($items as $sort => $item){
             $orderItem = new OrderItem();
@@ -96,10 +102,10 @@ class Order
 
         $invoice = new Invoice();
         $invoice->createNew($this, $externalId);
+        if($this->hasValidVoucher()){
+            $this->voucher->consume();
+        }
 
-
-
-        $paymentProvider->initializeDocuments($this);
         return $redirect;
     }
 
@@ -108,6 +114,9 @@ class Order
         $total = 0;
         foreach($this->items as $orderItem){
             $total += $orderItem->getPrice();
+        }
+        if($this->hasValidVoucher()){
+            $total -= $this->voucher->getValue();
         }
         return $total;
     }
@@ -132,6 +141,12 @@ class Order
         return $paymentMethod->getFees($this->getTotal());
     }
 
+    #[Pure]
+    public function hasValidVoucher(): bool
+    {
+        return !is_null($this->voucher) && $this->voucher->isValid();
+    }
+
     /**
      * @return string
      */
@@ -146,6 +161,14 @@ class Order
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @return Voucher|null
+     */
+    public function getVoucher(): ?Voucher
+    {
+        return $this->voucher;
     }
 
 

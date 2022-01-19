@@ -44,6 +44,16 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
             $items[] = $tempItems;
         }
 
+        if($order->hasValidVoucher()){
+            $items[] = [
+                'name' => 'Rabattcode',
+                'description' => '',
+                'amount' => ($order->getVoucher()->getValue() * -1),
+                'currency' => 'chf',
+                'quantity' => 1
+            ];
+        }
+
         $surcharge = $order->getFees();
 
         $items[] = [
