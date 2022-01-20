@@ -163,7 +163,7 @@ class Order
     public function sendConfirmationMail(): void
     {
         $mail = new Mail();
-        $mail->setTemplate('register');
+        $mail->setTemplate('order');
         $mail->setReceiver(new Email('stevebitzi@gmail.com'));
         $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
         $mail->addVariable('preheader', '');

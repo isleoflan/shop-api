@@ -93,17 +93,17 @@ class Ticket
 
 
         $pdf->setFont('changa', '', 8 * 1.4);
-        $pdf->TextCell(120, 45, 30, 5,'Kaufdatum:', 'R');
-        $pdf->TextCell(120, 50, 30, 5,'Ticket-ID:', 'R');
-        $pdf->TextCell(120, 55, 30, 5,'Bestellnummer:', 'R');
-        $pdf->TextCell(120, 60, 30, 5,'Zahlart:', 'R');
+        $pdf->TextCell(70, 45, 30, 5,'Kaufdatum:', 'R');
+        $pdf->TextCell(70, 50, 30, 5,'Ticket-ID:', 'R');
+        $pdf->TextCell(70, 55, 30, 5,'Bestellnummer:', 'R');
+        $pdf->TextCell(70, 60, 30, 5,'Zahlart:', 'R');
 
         $paymentMethod = $this->order->getPaymentMethod()->getPrettyValue();
 
-        $pdf->TextCell(155, 45, 30, 5, $this->order->getCreated()->format("d.m.Y"));
-        $pdf->TextCell(155, 50, 30, 5, $this->id);
-        $pdf->TextCell(155, 55, 30, 5, $this->order->getId());
-        $pdf->TextCell(155, 60, 30, 5, $paymentMethod);
+        $pdf->TextCell(105, 45, 80, 5, $this->order->getCreated()->format("d.m.Y"));
+        $pdf->TextCell(105, 50, 80, 5, $this->id);
+        $pdf->TextCell(105, 55, 80, 5, $this->order->getId());
+        $pdf->TextCell(105, 60, 80, 5, $paymentMethod);
 
 
 
@@ -134,7 +134,7 @@ class Ticket
         $pdf->TextCell(75, 140, 40, 5, '17:00 Uhr');
 
 
-        $pdf->TextCell(95, 135, 35, 5, 'bis');
+        $pdf->TextCell(105, 135, 35, 5, 'bis');
 
 
         $pdf->setFont('changa', 'B', 8 * 1.4);
