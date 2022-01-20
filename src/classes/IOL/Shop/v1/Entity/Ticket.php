@@ -162,7 +162,7 @@ class Ticket
 
 
         $logo = Logo::create(File::getBasePath().'/assets/images/iol-qr-logo.png')
-            ->setResizeToWidth(50);
+            ->setResizeToWidth(100);
 
         $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
         $result = $writer->write($qrCode, $logo);
