@@ -48,7 +48,7 @@ foreach (
         'forename' => 601002,
         'lastname' => 601003,
         'email' => 601004,
-        'street' => 601005,
+        'address' => 601005,
         'zipCode' => 601006,
         'city' => 601007,
     ] as $userField => $errorCode
