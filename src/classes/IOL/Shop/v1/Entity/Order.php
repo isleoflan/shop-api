@@ -60,7 +60,7 @@ class Order
         $this->userId = $values['user_id'];
         $this->created = new Date($values['created']);
         $this->paymentMethod = new PaymentMethod($values['payment_method']);
-
+        $this->loadItems();
     }
 
     public function loadItems(): void
