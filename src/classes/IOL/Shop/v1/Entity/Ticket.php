@@ -163,7 +163,7 @@ class Ticket
         $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
         $result = $writer->write($qrCode);
         $result->saveToFile($qrPath);
-        $pdf->Image($qrPath, 145, 80, 30, 30);
+        $pdf->Image($qrPath, 145, 80, 50, 50);
 
         /* BOTTOM PART */
         /*
