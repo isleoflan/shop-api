@@ -4,7 +4,8 @@ namespace IOL\Shop\v1\Entity;
 
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
+use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
@@ -14,7 +15,6 @@ use IOL\Shop\v1\DataSource\Environment;
 use IOL\Shop\v1\DataSource\File;
 use IOL\Shop\v1\DataType\Date;
 use IOL\Shop\v1\DataType\UUID;
-use IOL\Shop\v1\Enums\PaymentMethod;
 use IOL\Shop\v1\Exceptions\InvalidValueException;
 use IOL\Shop\v1\Exceptions\NotFoundException;
 
@@ -153,12 +153,16 @@ class Ticket
         $writer = new PngWriter();
         $qrCode = QrCode::create($this->id)
             ->setEncoding(new Encoding('UTF-8'))
-            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelMedium())
             ->setSize(300)
             ->setMargin(10)
             ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
             ->setForegroundColor(new Color(0, 0, 0))
             ->setBackgroundColor(new Color(255, 255, 255));
+
+
+        $logo = Logo::create(File::getBasePath().'/assets/images/iol-qr-logo.png')
+            ->setResizeToWidth(50);
 
         $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
         $result = $writer->write($qrCode);
