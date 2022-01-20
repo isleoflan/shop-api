@@ -167,7 +167,7 @@ class Ticket
         $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
         $result = $writer->write($qrCode, $logo);
         $result->saveToFile($qrPath);
-        $pdf->Image($qrPath, 145, 80, 50, 50);
+        $pdf->Image($qrPath, 155, 80, 40, 40);
 
         /* BOTTOM PART */
         /*
@@ -182,9 +182,9 @@ class Ticket
         $pdf->MultiCell(180, 5, utf8_decode('Vielen Dank für deinen Ticketkauf. Damit du weisst, was dich beim Check-In erwartet und was du tun musst, um Zugriff auf das Netzwerk zu erhalten, haben wir dir dies unten aufgelistet!'), $pdf->borders, 'L');
 
         $pdf->setXY(15, 170);
-        $pdf->MultiCell(85, 5, utf8_decode("1. Drucke dieses Ticket aus und nimm es mit zum Check-In. Mach es dir selbst einfach und lass - wenn möglich - das meiste im Auto, wenn du zum Check-In kommst.\r\n\r\n2. Beim Check-In-Schalter wird dein Ticket überprüft. Wenn alles stimmt, erhältst du dein Eintrittsband, welches an deinem Handgelenk festgemacht wird. Bitte lass es während der Isle of LAN immer an, du benötigst es auch, um dir etwas am Kiosk zu kaufen.\r\n\r\n3. Suche den Platz, den du reserviert hast, bringe anschliessend dein Material dort hin und richte dich ein. Wenn du Hilfe brauchst, zögere nicht, eine Person mit einem Staff T-Shirt anzusprechen.\r\n\r\n"), $pdf->borders, 'L');
+        $pdf->MultiCell(85, 5, utf8_decode("1. Drucke dieses Ticket aus und nimm es mit zum Check-In. Lass vorerst bitte alles im Auto, wenn du zum Check-In kommst.\r\n\r\n2. Als erstes müssen wir von dir ein COVID-Zertifikat (2G+) sehen. Dieses wird dann überprüft. Halte hierzu bitte das Zertifikat und einen Ausweis bereit.\r\n\r\n"), $pdf->borders, 'L');
         $pdf->setXY(110, 170);
-        $pdf->MultiCell(85, 5, utf8_decode("4. Damit du auf das Netzwerk zugreifen kannst, musst du einen aktuellen Scan (nicht älter als 48h) von einem zugelassenen Virenscanner im Userbereich der Webseite hochladen. Du hast in diesem Moment Zugriff auf alle Isle of LAN Seiten und die Update-Server der zugelassenen Virenscanner.  Welche Scanner zugelassen sind, findest du unter https://isleoflan.ch/scanner\r\n\r\n5. Deinen Scan prüfen wir so schnell wie möglich. Wenn alles OK ist, werden wir dich benachrichtigen und du kannst loslegen."), $pdf->borders, 'L');
+        $pdf->MultiCell(85, 5, utf8_decode("3. Anschliessend wird am Check-In-Schalter wird dein Ticket überprüft. Wenn alles stimmt, erhältst du dein Eintrittsband, welches an deinem Handgelenk festgemacht wird. Bitte lass es während der Isle of LAN immer an, du benötigst es auch, um dir etwas am Kiosk zu kaufen.\r\n\r\n4. Suche den Platz, den du reserviert hast, bringe anschliessend dein Material dort hin und richte dich ein. Wenn du Hilfe brauchst, zögere nicht, eine Person mit einem Staff T-Shirt anzusprechen."), $pdf->borders, 'L');
 
 
         $pdf->SetLineWidth(0.5);
