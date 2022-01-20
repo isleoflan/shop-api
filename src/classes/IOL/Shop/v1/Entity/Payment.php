@@ -55,7 +55,7 @@ class Payment
         $database->insert(self::DB_TABLE, [
             'id'            => $this->id,
             'invoice_id'    => $this->invoice->getId(),
-            'created'       => $this->time->format(Date::DATETIME_FORMAT_MICRO),
+            'time'          => $this->time->format(Date::DATETIME_FORMAT_MICRO),
             'value'         => $this->value
         ]);
     }
