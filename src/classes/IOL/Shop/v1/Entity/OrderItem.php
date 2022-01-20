@@ -24,7 +24,7 @@ class OrderItem
     private int $amount;
     private int $sort;
 
-    public function __construct(?int $id = null)
+    public function __construct(?string $id = null)
     {
         if (!is_null($id)) {
             if (!UUID::isValid($id)) {

@@ -17,7 +17,7 @@ class Payment
     private int $value;
     private Date $time;
 
-    public function __construct(?int $id = null)
+    public function __construct(?string $id = null)
     {
         if (!is_null($id)) {
             if (!UUID::isValid($id)) {
