@@ -2,6 +2,12 @@
 
 namespace IOL\Shop\v1\Entity;
 
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
 use IOL\Shop\v1\Content\PDF;
 use IOL\Shop\v1\DataSource\Database;
 use IOL\Shop\v1\DataSource\Environment;
