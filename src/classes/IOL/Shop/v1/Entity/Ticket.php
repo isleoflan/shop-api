@@ -14,7 +14,7 @@ use IOL\Shop\v1\Exceptions\NotFoundException;
 
 class Ticket
 {
-    public const DB_TABLE = 'ticket';
+    public const DB_TABLE = 'tickets';
 
     private string $id;
     private Order $order;
