@@ -14,6 +14,8 @@
     "stripe/stripe-php": "^7.14",
     "paypal/rest-api-sdk-php": "^1.14",
     "mvjacobs/coinbase-commerce": "*",
-    "vlucas/phpdotenv": "^5.3"
+    "php-amqplib/php-amqplib": ">=3.0",
+    "vlucas/phpdotenv": "^5.3",
+    "ext-sockets": "*"
   }
 }

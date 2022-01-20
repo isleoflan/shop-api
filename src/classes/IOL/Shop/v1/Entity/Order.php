@@ -145,6 +145,24 @@ class Order
         return $paymentMethod->getFees($this->getTotal());
     }
 
+    public function sendConfirmationMail(): void
+    {
+        switch($this->paymentMethod->getValue()){
+            case PaymentMethod::PREPAYMENT:
+                $paymentMethod = new Prepayment();
+                break;
+            case PaymentMethod::STRIPE:
+                $paymentMethod = new Stripe();
+                break;
+            case PaymentMethod::PAYPAL:
+                $paymentMethod = new PayPal();
+                break;
+            case PaymentMethod::CRYPTO:
+                $paymentMethod = new Crypto();
+                break;
+        }
+    }
+
     #[Pure]
     public function hasValidVoucher(): bool
     {
