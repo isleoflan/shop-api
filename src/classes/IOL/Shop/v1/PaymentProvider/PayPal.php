@@ -31,7 +31,7 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
 
     public function createPayment(Order $order): string
     {
-        $apiContext = new \PayPal\Rest\ApiContext(new \PayPal\Auth\OAuthTokenCredential(Environment::get('PAYPAL_ID'), Environment::get('PAYPAL_SECRET')));
+        $apiContext = new \PayPal\Rest\ApiContext(new \PayPal\Auth\OAuthTokenCredential(Environment::get('PAYPAL_ID_'.Environment::get('PAYMENT_MODE')), Environment::get('PAYPAL_SECRET_'.Environment::get('PAYMENT_MODE'))));
 
         if (Environment::get('PAYMENT_MODE') == 'live'){
             $apiContext->setConfig(['mode' => 'live']);

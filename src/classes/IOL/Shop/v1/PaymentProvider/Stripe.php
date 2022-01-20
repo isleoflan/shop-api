@@ -61,7 +61,7 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
         $userData = $user->getUserInfo();
         $userData = $userData['response']['data'];
 
-        \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET'));
+        \Stripe\Stripe::setApiKey(Environment::get('STRIPE_SECRET_'.Environment::get('PAYMENT_MODE')));
 
         $payload = [
             'payment_method_types' => ['card'],
