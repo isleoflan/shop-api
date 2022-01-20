@@ -36,7 +36,7 @@ class Invoice
         $database = Database::getInstance();
         $database->where('order_id', $order->getId());
         $row = $database->get(self::DB_TABLE, 1);
-        $this->loadData($row);
+        $this->loadData($row[0]);
     }
 
     /**
