@@ -60,6 +60,19 @@ class Order
         $this->userId = $values['user_id'];
         $this->created = new Date($values['created']);
         $this->paymentMethod = new PaymentMethod($values['payment_method']);
+
+    }
+
+    public function loadItems(): void
+    {
+        $database = Database::getInstance();
+        $database->where('order_id', $this->id);
+        $database->orderBy('sort');
+        foreach($database->get(OrderItem::DB_TABLE) as $itemData){
+            $item = new OrderItem();
+            $item->loadData($itemData);
+            $this->items[] = $item;
+        }
     }
 
     public function createNew(string $userId, array $items, PaymentMethod $paymentMethod, ?Voucher $voucher): string

@@ -6,7 +6,7 @@ use IOL\Shop\v1\DataSource\File;
 
 class PDF extends \FPDF
 {
-    public int $borders = 1;
+    public int $borders = 0;
 
     public function __construct(string $title)
     {

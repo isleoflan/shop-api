@@ -93,17 +93,17 @@ class Ticket
 
 
         $pdf->setFont('changa', '', 8 * 1.4);
-        $pdf->TextCell(70, 45, 30, 5,'Kaufdatum:', 'R');
-        $pdf->TextCell(70, 50, 30, 5,'Ticket-ID:', 'R');
-        $pdf->TextCell(70, 55, 30, 5,'Bestellnummer:', 'R');
-        $pdf->TextCell(70, 60, 30, 5,'Zahlart:', 'R');
+        $pdf->TextCell(80, 45, 30, 5,'Kaufdatum:', 'R');
+        $pdf->TextCell(80, 50, 30, 5,'Ticket-ID:', 'R');
+        $pdf->TextCell(80, 55, 30, 5,'Bestellnummer:', 'R');
+        $pdf->TextCell(80, 60, 30, 5,'Zahlart:', 'R');
 
         $paymentMethod = $this->order->getPaymentMethod()->getPrettyValue();
 
-        $pdf->TextCell(105, 45, 80, 5, $this->order->getCreated()->format("d.m.Y"));
-        $pdf->TextCell(105, 50, 80, 5, $this->id);
-        $pdf->TextCell(105, 55, 80, 5, $this->order->getId());
-        $pdf->TextCell(105, 60, 80, 5, $paymentMethod);
+        $pdf->TextCell(115, 45, 80, 5, $this->order->getCreated()->format("d.m.Y"));
+        $pdf->TextCell(115, 50, 80, 5, $this->id);
+        $pdf->TextCell(115, 55, 80, 5, $this->order->getId());
+        $pdf->TextCell(115, 60, 80, 5, $paymentMethod);
 
 
 
@@ -134,7 +134,7 @@ class Ticket
         $pdf->TextCell(75, 140, 40, 5, '17:00 Uhr');
 
 
-        $pdf->TextCell(105, 135, 35, 5, 'bis');
+        $pdf->TextCell(115, 135, 35, 5, 'bis');
 
 
         $pdf->setFont('changa', 'B', 8 * 1.4);
@@ -144,7 +144,20 @@ class Ticket
         $pdf->TextCell(130, 140, 40, 5, '13:00 Uhr');
 
 
+        $writer = new PngWriter();
+        $qrCode = QrCode::create($this->id)
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));
 
+        $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
+        $result = $writer->write($qrCode);
+        $result->saveToFile($qrPath);
+        $pdf->Image($qrPath, 145, 80, 30, 30);
 
         /* BOTTOM PART */
         /*

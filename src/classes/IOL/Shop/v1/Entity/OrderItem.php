@@ -34,7 +34,7 @@ class OrderItem
         }
     }
 
-    private function loadData(array|false $values): void
+    public function loadData(array|false $values): void
     {
 
         if (!$values || count($values) === 0) {
