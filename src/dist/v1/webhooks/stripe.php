@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use IOL\Shop\v1\DataSource\Environment;
+
+error_reporting(E_ALL);
+
 $payload = @file_get_contents('php://input');
 $event = null;
 
@@ -12,7 +16,7 @@ $event = null;
 
 try {
     $event = \Stripe\Webhook::constructEvent(
-        $payload, $signatureHeader, \IOL\Shop\v1\DataSource\Environment::get('STRIPE_WEBHOOK_SECRET')
+        $payload, $signatureHeader, Environment::get('STRIPE_WEBHOOK_SECRET_'. Environment::get('PAYMENT_MODE'))
     );
 } catch(\UnexpectedValueException $e) {
     // Invalid payload
@@ -31,6 +35,7 @@ switch($event->type){
         break;
 }
 
+file_put_contents('/var/www/stripe.txt', var_export($event->data->object, true)."\r\n\r\n");
 
 // Handle the event
 echo 'Received unknown event type ' . $event->type;
