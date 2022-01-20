@@ -16,6 +16,7 @@
     "mvjacobs/coinbase-commerce": "*",
     "php-amqplib/php-amqplib": ">=3.0",
     "vlucas/phpdotenv": "^5.3",
+    "setasign/fpdf": "^1.8",
     "ext-sockets": "*"
   }
 }

@@ -28,17 +28,26 @@ try {
     exit();
 }
 
+$object = $event->data->object;
 
-switch($event->type){
-    case 'checkout.session.completed':
-        file_put_contents('/var/www/stripe.txt', var_export($event->data->object, true)."\r\n\r\n");
-        break;
+if($event->type === 'checkout.session.completed') {
+        /** @var $object \Stripe\Checkout\Session */
+
+        if($object->status === 'complete') {
+            $orderId = $object->client_reference_id;
+
+            try {
+                $order = new \IOL\Shop\v1\Entity\Order($orderId);
+            } catch (\IOL\Shop\v1\Exceptions\IOLException) {}
+
+            $invoice = new \IOL\Shop\v1\Entity\Invoice();
+            $invoice->getForOrder($order);
+
+            $invoice->createPayment($invoice->getValue());
+            $order->sendConfirmationMail();
+
+            $order->completeOrder();
+        }
 }
-
-file_put_contents('/var/www/stripe.txt', var_export($event->data->object, true)."\r\n\r\n");
-
-// Handle the event
-echo 'Received unknown event type ' . $event->type;
-
 
 http_response_code(200);

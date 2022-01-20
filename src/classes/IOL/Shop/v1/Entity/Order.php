@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace IOL\Shop\v1\Entity;
 
+use IOL\Shop\v1\Content\Mail;
 use IOL\Shop\v1\DataSource\Database;
+use IOL\Shop\v1\DataSource\Environment;
+use IOL\Shop\v1\DataSource\Queue;
 use IOL\Shop\v1\DataType\Date;
+use IOL\Shop\v1\DataType\Email;
 use IOL\Shop\v1\DataType\UUID;
 use IOL\Shop\v1\Enums\OrderStatus;
 use IOL\Shop\v1\Enums\PaymentMethod;
+use IOL\Shop\v1\Enums\QueueType;
 use IOL\Shop\v1\Exceptions\InvalidValueException;
 use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Exceptions\NotFoundException;
@@ -29,6 +34,8 @@ class Order
     private PaymentMethod $paymentMethod;
     private ?Voucher $voucher = null;
     private OrderStatus $orderStatus;
+
+    private ?Invoice $invoice = null;
 
     private array $items = [];
 
@@ -72,7 +79,7 @@ class Order
             $this->items[] = $orderItem;
         }
 
-        if($this->getTotal() === 0){
+        if($this->getSubtotal() === 0){
             $this->paymentMethod = new PaymentMethod(PaymentMethod::PREPAYMENT);
         }
 
@@ -106,6 +113,9 @@ class Order
 
         $invoice = new Invoice();
         $invoice->createNew($this, $externalId);
+
+        $this->invoice = $invoice;
+
         if($this->hasValidVoucher()){
             $this->voucher->consume();
         }
@@ -113,7 +123,7 @@ class Order
         return $redirect;
     }
 
-    public function getTotal(): int
+    public function getSubtotal(): int
     {
         $total = 0;
         foreach($this->items as $orderItem){
@@ -142,31 +152,137 @@ class Order
                 break;
         }
 
-        return $paymentMethod->getFees($this->getTotal());
+        return $paymentMethod->getFees($this->getSubtotal());
+    }
+
+    public function getTotal(): int
+    {
+        return $this->getSubtotal() + $this->getFees();
     }
 
     public function sendConfirmationMail(): void
     {
+        $mail = new Mail();
+        $mail->setTemplate('register');
+        $mail->setReceiver(new Email('stevebitzi@gmail.com'));
+        $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
+        $mail->addVariable('preheader', '');
+        $mail->addVariable('name', 'Testname'); //
+        $mail->addVariable('orderid', $this->getId());
+        $mail->addVariable('orderdate', $this->created->format("d.m.Y"));
+        //$mail->addVariable('orderaddress', implode("<br />",$user->getAddressArray()));
+        $mail->addVariable('orderaddress', 'Address goes here');
+        $mail->addVariable('cart', $this->getMailCart());
+        $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
+
         switch($this->paymentMethod->getValue()){
             case PaymentMethod::PREPAYMENT:
-                $paymentMethod = new Prepayment();
+                if($this->getTotal() === 0){
+                    $mail->addAttachment($this->generateTicket());
+                    $mail->addVariable('paymentdetails','');
+                } else {
+                    //$mail->addAttachment($this->generateInvoice());
+                    //$mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
+                }
                 break;
             case PaymentMethod::STRIPE:
-                $paymentMethod = new Stripe();
-                break;
             case PaymentMethod::PAYPAL:
-                $paymentMethod = new PayPal();
-                break;
             case PaymentMethod::CRYPTO:
-                $paymentMethod = new Crypto();
+                $mail->addAttachment($this->generateTicket());
+                $mail->addVariable('paymentdetails','');
                 break;
         }
+
+
+        $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
+        $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
     }
 
     #[Pure]
     public function hasValidVoucher(): bool
     {
         return !is_null($this->voucher) && $this->voucher->isValid();
+    }
+
+    public function generateTicket(): string
+    {
+        $ticket = new Ticket();
+        $ticket->createNew($this);
+        return $ticket->generatePDF();
+    }
+
+    public function completeOrder(): void
+    {
+        $this->orderStatus = new OrderStatus(OrderStatus::FINISHED);
+        $database = Database::getInstance();
+        $database->where('id', $this->id);
+        $database->update(self::DB_TABLE, [
+            'status' => $this->orderStatus->getValue()
+        ]);
+    }
+
+    public function getTwintText(): string
+    {
+        $return = '';
+        $paymentinfo = [
+             ['name' => 'Telefonnummer', 'value' => '076 688 33 84'],
+             ['name' => 'Empfänger', 'value' => 'Isle of LAN'],
+             ['name' => 'Betrag', 'value' => 'CHF '.number_format($this->getTotal() / 100,2,".","'")],
+             ['name' => 'Nachricht', 'value' => $this->getId()],
+        ];
+        foreach($paymentinfo as $info){
+            $return .= '<tr>';
+            $return .= '<td style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 12px 4px 0;">'.$info['name'].'</td>';
+            $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 12px;" align="right"><strong style="font-weight: 600;">'.str_replace(" ","&nbsp;",$info['value']).'</strong></td>';
+            $return .= '</tr>';
+        }
+
+        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-top-width: 1px; border-top-style: solid; padding: 40px 48px; border: #3e495b;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">'.$return.'</table></td></tr>';
+        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Du kannst auch ganz bequem mit TWINT bezahlen. Sende hierzu einfach eine Zahlung an:</p></td></tr>'.$return;
+    }
+
+    public function getMailCart(): string
+    {
+        $return  = '<table class="table" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%;">';
+        $return .= '<tr>';
+        $return .= '<th style="text-transform: uppercase; font-weight: 600; color: #9eb0b7; font-size: 12px; padding: 0 0 4px;"></th>';
+        $return .= '<th class="text-right" style="text-transform: uppercase; font-weight: 600; color: #9eb0b7; font-size: 12px; padding: 0 0 4px;" align="right">Preis</th>';
+        $return .= '</tr>';
+
+        foreach($this->items as $item){
+            $return .= '<tr>';
+            $return .= '<td class="pl-md w-100p" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; width: 100%; padding: 4px 12px 4px 0;">';
+            $return .= '<strong style="font-weight: 600;">'.$item->getProduct()->getPaymentTitle().'</strong><br />';
+            $return .= '<span class="text-muted" style="color: #9eb0b7;">'.$item->getProduct()->getPaymentDescription().'</span>';
+            $return .= '</td>';
+            $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 0;" align="right">CHF '.number_format($item->getPrice() / 100,2,".","'").'</td>';
+            $return .= '</tr>';
+        }
+
+
+        $fee = $this->getFees();
+        if ($fee > 0) {
+            $return .= '<tr>';
+            $return .= '<td class="pl-md w-100p" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; width: 100%; padding: 4px 12px 4px 0;">';
+            $return .= '<strong style="font-weight: 600;">Zahlungsgebühr</strong><br />';
+            $return .= '</td>';
+            $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 0;" align="right">CHF&nbsp;'.number_format($fee / 100,2,".","'").'</td>';
+            $return .= '</tr>';
+
+        }
+
+        $return .= '<tr>';
+        $return .= '<td class="pl-md w-100p" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; width: 100%; padding: 4px 12px 4px 0;">';
+        $return .= '<strong style="font-weight: 600;">TOTAL</strong><br />';
+        $return .= '</td>';
+        $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 0;" align="right"><strong>CHF&nbsp;'.number_format($this->getTotal() / 100,2,".","'").'</strong></td>';
+        $return .= '</tr>';
+
+
+        $return .= '</table>';
+
+
+        return $return;
     }
 
     /**
@@ -191,6 +307,30 @@ class Order
     public function getVoucher(): ?Voucher
     {
         return $this->voucher;
+    }
+
+    /**
+     * @return PaymentMethod
+     */
+    public function getPaymentMethod(): PaymentMethod
+    {
+        return $this->paymentMethod;
+    }
+
+    /**
+     * @return Date
+     */
+    public function getCreated(): Date
+    {
+        return $this->created;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserId(): string
+    {
+        return $this->userId;
     }
 
 

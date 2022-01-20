@@ -85,16 +85,16 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
 
         if($order->hasValidVoucher()) {
             $details->setShippingDiscount(number_format(($order->getVoucher()->getValue()) / 100, 2, ".", ''));
-            $details->setSubtotal(number_format(($order->getTotal() + $order->getFees() + $order->getVoucher()->getValue()) / 100,2,".",''));
+            $details->setSubtotal(number_format(($order->getTotal() + $order->getVoucher()->getValue()) / 100,2,".",''));
 
         } else {
-            $details->setSubtotal(number_format(($order->getTotal() + $order->getFees()) / 100,2,".",''));
+            $details->setSubtotal(number_format(($order->getTotal()) / 100,2,".",''));
         }
 
 
 
         $amount = new \PayPal\Api\Amount();
-        $amount->setTotal(number_format(($order->getTotal() + $order->getFees()) / 100,2,".",''));
+        $amount->setTotal(number_format(($order->getTotal()) / 100,2,".",''));
         $amount->setCurrency('CHF');
         $amount->setDetails($details);
 

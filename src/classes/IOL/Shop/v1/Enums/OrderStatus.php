@@ -7,6 +7,6 @@ namespace IOL\Shop\v1\Enums;
 class OrderStatus extends Enum
 {
     public const CREATED = 'CREATED';
-    public const PAYED = 'PAYED';
+    public const CANCELLED = 'CANCELLED';
     public const FINISHED = 'FINISHED';
 }

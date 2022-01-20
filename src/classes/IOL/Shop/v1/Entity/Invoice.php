@@ -28,6 +28,21 @@ class Invoice
         }
     }
 
+    /**
+     * @throws NotFoundException|InvalidValueException
+     */
+    public function getForOrder(Order $order)
+    {
+        $database = Database::getInstance();
+        $database->where('order_id', $order->getId());
+        $row = $database->get(self::DB_TABLE, 1);
+        $this->loadData($row);
+    }
+
+    /**
+     * @throws NotFoundException
+     * @throws InvalidValueException
+     */
     private function loadData(array|false $values): void
     {
 
@@ -48,7 +63,7 @@ class Invoice
         $this->order = $order;
         $this->created = new Date('u');
         $this->externalId = $externalId;
-        $this->value = $this->order->getTotal() + $this->order->getFees();
+        $this->value = $this->order->getTotal();
 
         $database = Database::getInstance();
         $database->insert(self::DB_TABLE, [
@@ -58,5 +73,33 @@ class Invoice
             'external_id'   => $this->externalId,
             'value'         => $this->value
         ]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getValue(): int
+    {
+        return $this->value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+
+    public function createPayment(int $value)
+    {
+        $payment = new Payment();
+        $payment->createNew($this, $value);
+    }
+
+    public function generatePDF(): string
+    {
+return '';
     }
 }

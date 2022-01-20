@@ -30,7 +30,7 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
             'description' => 'Bestell-Nr. '.$order->getId(),
             'pricing_type' => 'fixed_price',
             'local_price' => [
-                'amount' => number_format(($order->getTotal() + $order->getFees()) / 100, 2, '.', ''),
+                'amount' => number_format(($order->getTotal()) / 100, 2, '.', ''),
                 'currency' => 'CHF'
             ],
             'requested_info' => []
