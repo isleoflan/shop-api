@@ -26,7 +26,7 @@ class PDF extends \FPDF
 
         /* HEADER */
         $this->addPage();
-        $this->Image(File::getBasePath().'/assets/iol_black.jpg', 15, 15, 25, 12);
+        $this->Image(File::getBasePath().'/assets/images/iol_black.jpg', 15, 15, 25, 12);
 
         $this->setFont('changa-bold', 'B', 15 * 1.4);
         $this->setXY(50, 15);
