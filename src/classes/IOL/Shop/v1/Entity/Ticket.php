@@ -165,7 +165,7 @@ class Ticket
             ->setResizeToWidth(50);
 
         $qrPath = Environment::get('GENERATED_CONTENT_PATH') .'/qr/ticket-'.$this->id.'.png';
-        $result = $writer->write($qrCode);
+        $result = $writer->write($qrCode, $logo);
         $result->saveToFile($qrPath);
         $pdf->Image($qrPath, 145, 80, 50, 50);
 
