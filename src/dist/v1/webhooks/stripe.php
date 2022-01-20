@@ -5,33 +5,35 @@ declare(strict_types=1);
 $payload = @file_get_contents('php://input');
 $event = null;
 
-file_put_contents('/var/www/stripe.txt', $payload."\r\n\r\n");
-/*
+
+$payload = file_get_contents('php://input');
+$signatureHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+$event = null;
+
 try {
-    $event = \Stripe\Event::constructFrom(
-        json_decode($payload, true)
+    $event = \Stripe\Webhook::constructEvent(
+        $payload, $signatureHeader, \IOL\Shop\v1\DataSource\Environment::get('STRIPE_WEBHOOK_SECRET')
     );
 } catch(\UnexpectedValueException $e) {
     // Invalid payload
     http_response_code(400);
     exit();
+} catch(\Stripe\Exception\SignatureVerificationException $e) {
+    // Invalid signature
+    http_response_code(400);
+    exit();
 }
+
+
+switch($event->type){
+    case 'checkout.session.completed':
+        file_put_contents('/var/www/stripe.txt', var_export($event->data->object, true)."\r\n\r\n");
+        break;
+}
+
 
 // Handle the event
-switch ($event->type) {
-    case 'payment_intent.succeeded':
-        $paymentIntent = $event->data->object; // contains a \Stripe\PaymentIntent
-        // Then define and call a method to handle the successful payment intent.
-        // handlePaymentIntentSucceeded($paymentIntent);
-        break;
-    case 'payment_method.attached':
-        $paymentMethod = $event->data->object; // contains a \Stripe\PaymentMethod
-        // Then define and call a method to handle the successful attachment of a PaymentMethod.
-        // handlePaymentMethodAttached($paymentMethod);
-        break;
-    // ... handle other event types
-    default:
-        echo 'Received unknown event type ' . $event->type;
-}
+echo 'Received unknown event type ' . $event->type;
 
-http_response_code(200);*/
+
+http_response_code(200);
