@@ -254,7 +254,7 @@ class Order
         foreach($this->items as $item){
             $itemData[] = ($item->getProduct()->getCategory()->getId() == 3 ? 1 : $item->getAmount()).'x '.$item->getProduct()->getTitle();
         }
-        $data['embeds']['fields'][] = ['name' => 'Artikel', 'value' => implode("\r\n", $itemData), 'inline' => true];
+        $data['embeds'][0]['fields'][] = ['name' => 'Artikel', 'value' => implode("\r\n", $itemData), 'inline' => true];
 
         $data = json_encode($data);
 
