@@ -5,10 +5,6 @@ declare(strict_types=1);
 use CoinbaseCommerce\Webhook;
 use IOL\Shop\v1\DataSource\Environment;
 
-error_reporting(E_ALL);
-
-
-
 $headerName = 'X-Cc-Webhook-Signature';
 $headers = getallheaders();
 
