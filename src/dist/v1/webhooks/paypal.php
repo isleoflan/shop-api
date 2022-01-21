@@ -46,9 +46,6 @@ if($output->getVerificationStatus() === 'SUCCESS') {
         $order = new \IOL\Shop\v1\Entity\Order($orderId);
     } catch (\IOL\Shop\v1\Exceptions\IOLException) {}
 
-
-    $keys = $this->getAPIKey('paypal');
-
     $payment = \PayPal\Api\Payment::get($paymentId, $apiContext);
 
     $execution = new \PayPal\Api\PaymentExecution();
