@@ -326,6 +326,58 @@ class Order
         $database->update(self::DB_TABLE, [
             'status' => $this->orderStatus->getValue()
         ]);
+        $foodItemsCat = new \IOL\Shop\v1\Entity\Category(2);
+        $foodItemsCat->loadProducts();
+
+        $specialDealCat = new \IOL\Shop\v1\Entity\Category(5);
+        $specialDealCat->loadProducts();
+        $specialDealID = $specialDealCat->getProducts();
+        /** @var Product $specialDeal */
+        $specialDealID = $specialDeal[0];
+
+        $topupCat = new \IOL\Shop\v1\Entity\Category(3);
+        $topupCat->loadProducts();
+        $topupId = $topupCat->getProducts();
+        /** @var Product $topupId */
+        $topupId = $topupId[0];
+
+        $foodItems = [];
+        /** @var Product $product */
+        foreach($foodItemsCat->getProducts() as $product){
+            $foodItems[$product->getId()] = false;
+        }
+
+        $database = Database::getInstance();
+
+        foreach($this->items as $item){
+            /** @var OrderItem $item */
+            switch($item->getProduct()->getId()){
+                case $topupId:
+                    $database->insert('transactions', [
+                        'id' => UUID::newId('transactions'),
+                        'value' => $item->getPrice() * -1,
+                        'user_id' => $this->userId,
+                        'time' => Date::now(Date::DATETIME_FORMAT_MICRO)
+                    ]);
+                    break;
+                case $specialDealID:
+                    foreach($foodItems as $foodId => $val) {
+                        $database->insert('food', [
+                            'user_id' => $this->userId,
+                            'product_id' => $foodId
+                        ]);
+                    }
+                    break;
+            }
+
+            if(in_array($item->getProduct()->getId(), array_keys($foodItems))){
+                $database->insert('food', [
+                    'user_id' => $this->userId,
+                    'product_id' => $foodId
+                ]);
+            }
+        }
+
     }
 
     public function getTwintText(): string
