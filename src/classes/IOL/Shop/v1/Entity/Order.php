@@ -372,7 +372,7 @@ class Order
             if(in_array($item->getProduct()->getId(), array_keys($foodItems))){
                 $database->insert('food', [
                     'user_id' => $this->userId,
-                    'product_id' => $foodId
+                    'product_id' => $item->getProduct()->getId()
                 ]);
             }
         }
