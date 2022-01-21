@@ -6,9 +6,6 @@ use IOL\Shop\v1\DataSource\Environment;
 
 error_reporting(E_ALL);
 
-$payload = @file_get_contents('php://input');
-$event = null;
-
 
 $payload = file_get_contents('php://input');
 $signatureHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'];
