@@ -175,40 +175,42 @@ class Order
 
     public function sendConfirmationMail(): void
     {
-        $mail = new Mail();
-        $mail->setTemplate('order');
-        $mail->setReceiver(new Email('stevebitzi@gmail.com'));
-        $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
-        $mail->addVariable('preheader', '');
-        $mail->addVariable('name', 'Testname'); //
-        $mail->addVariable('orderid', $this->getId());
-        $mail->addVariable('orderdate', $this->created->format("d.m.Y"));
-        //$mail->addVariable('orderaddress', implode("<br />",$user->getAddressArray()));
-        $mail->addVariable('orderaddress', 'Address goes here');
-        $mail->addVariable('cart', $this->getMailCart());
-        $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
+        if($this->orderStatus->getValue() === OrderStatus::CREATED) {
+            $mail = new Mail();
+            $mail->setTemplate('order');
+            $mail->setReceiver(new Email('stevebitzi@gmail.com'));
+            $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
+            $mail->addVariable('preheader', '');
+            $mail->addVariable('name', 'Testname'); //
+            $mail->addVariable('orderid', $this->getId());
+            $mail->addVariable('orderdate', $this->created->format("d.m.Y"));
+            //$mail->addVariable('orderaddress', implode("<br />",$user->getAddressArray()));
+            $mail->addVariable('orderaddress', 'Address goes here');
+            $mail->addVariable('cart', $this->getMailCart());
+            $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
 
-        switch($this->paymentMethod->getValue()){
-            case PaymentMethod::PREPAYMENT:
-                if($this->getTotal() === 0){
+            switch ($this->paymentMethod->getValue()) {
+                case PaymentMethod::PREPAYMENT:
+                    if ($this->getTotal() === 0) {
+                        $mail->addAttachment($this->generateTicket());
+                        $mail->addVariable('paymentdetails', '');
+                    } else {
+                        //$mail->addAttachment($this->generateInvoice());
+                        //$mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
+                    }
+                    break;
+                case PaymentMethod::STRIPE:
+                case PaymentMethod::PAYPAL:
+                case PaymentMethod::CRYPTO:
                     $mail->addAttachment($this->generateTicket());
-                    $mail->addVariable('paymentdetails','');
-                } else {
-                    //$mail->addAttachment($this->generateInvoice());
-                    //$mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
-                }
-                break;
-            case PaymentMethod::STRIPE:
-            case PaymentMethod::PAYPAL:
-            case PaymentMethod::CRYPTO:
-                $mail->addAttachment($this->generateTicket());
-                $mail->addVariable('paymentdetails','');
-                break;
+                    $mail->addVariable('paymentdetails', '');
+                    break;
+            }
+
+
+            $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
+            $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
         }
-
-
-        $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
-        $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
     }
 
     #[Pure]
