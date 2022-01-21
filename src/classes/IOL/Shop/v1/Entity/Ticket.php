@@ -92,7 +92,7 @@ class Ticket
         //$pdf->TextCell(14, 45, 100, 5,'[GENDER]');
         $pdf->TextCell(14, 50, 100, 5,$this->order->userData['forename'].' '.$this->order->userData['lastname']);
         $pdf->TextCell(14, 55, 100, 5,$this->order->userData['address']);
-        $pdf->TextCell(14, 60, 100, 5,$this->userData['zipCode'].' '.$this->userData['city']);
+        $pdf->TextCell(14, 60, 100, 5,$this->order->userData['zipCode'].' '.$this->order->userData['city']);
 
 
         /* TICKET DATA (TOP RIGHT) */

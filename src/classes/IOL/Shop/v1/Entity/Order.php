@@ -255,7 +255,7 @@ class Order
         if($this->orderStatus->getValue() === OrderStatus::CREATED) {
             $mail = new Mail();
             $mail->setTemplate('order');
-            $mail->setReceiver(new Email('stevebitzi@gmail.com'));
+            $mail->setReceiver(new Email($this->userData['email']));
             $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
             $mail->addVariable('preheader', '');
             $mail->addVariable('name', $this->userData['forename']); //
