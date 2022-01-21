@@ -323,7 +323,7 @@ class Invoice
         }
 
 
-        $filename = Environment::get('GENERATED_CONTENT_PATH') . '/invoice/invoice-'.$this->id.'.pdf';
+        $filename = Environment::get('GENERATED_CONTENT_PATH') . '/invoices/invoice-'.$this->id.'.pdf';
 
         /* OUTPUT */
         $pdf->Output("F", $filename);
