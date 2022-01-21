@@ -104,8 +104,8 @@ class PayPal extends PaymentProvider implements PaymentProviderInterface
         $transaction->setInvoiceNumber($order->getId());
 
         $redirectUrls = new \PayPal\Api\RedirectUrls();
-        $redirectUrls->setReturnUrl(Environment::get('SUCCESS_URL').'?oid='.$order->getId());
-        $redirectUrls->setCancelUrl(Environment::get('CANCEL_URL').'?oid='.$order->getId());
+        $redirectUrls->setReturnUrl(Environment::get('SUCCESS_URL'));
+        $redirectUrls->setCancelUrl(Environment::get('CANCEL_URL').'/'.$order->getId());
 
         $payment = new \PayPal\Api\Payment();
         $payment->setIntent('sale');

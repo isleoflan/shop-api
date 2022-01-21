@@ -68,8 +68,8 @@ class Stripe extends PaymentProvider implements PaymentProviderInterface
             'client_reference_id' => $order->getId(),
             'line_items' => [$items],
             'customer_email' => $userData['email'],
-            'success_url' => Environment::get('SUCCESS_URL').'?stsid={CHECKOUT_SESSION_ID}&oid='.$order->getId(),
-            'cancel_url' => Environment::get('CANCEL_URL').'?oid='.$order->getId(),
+            'success_url' => Environment::get('SUCCESS_URL'),
+            'cancel_url' => Environment::get('CANCEL_URL').'/'.$order->getId(),
         ];
 
         if($order->hasValidVoucher()){

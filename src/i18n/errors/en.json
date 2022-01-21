@@ -202,6 +202,14 @@
     "message": "Field username missing or invalid",
     "errorCode": 400
   },
+  "601201": {
+    "message": "Field orderId missing or invalid",
+    "errorCode": 400
+  },
+  "601202": {
+    "message": "Field userId missing or invalid",
+    "errorCode": 400
+  },
 
 
 

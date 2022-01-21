@@ -80,6 +80,25 @@ class Order
         }
     }
 
+    /**
+     * @throws NotFoundException
+     * @throws InvalidValueException
+     */
+    public function loadForUser(string $userId): bool
+    {
+        if(!UUID::isValid($userId)){
+            throw new InvalidValueException('Invalid User ID');
+        }
+        $database = Database::getInstance();
+        $data = $database->query('SELECT * FROM '.self::DB_TABLE.' WHERE user_id = "'.$userId.'" AND (status = "'.OrderStatus::CREATED.'" OR status = "'.OrderStatus::FINISHED.'") LIMIT 1');
+        if(isset($data[0])){
+            $this->loadData($data[0]);
+            return true;
+        }
+        return false;
+
+    }
+
     public function createNew(string $userId, array $items, PaymentMethod $paymentMethod, string $username, array $userData, ?Voucher $voucher): string
     {
         $this->id = UUID::newId(self::DB_TABLE);
@@ -265,6 +284,16 @@ class Order
             $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
             $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
         }
+    }
+
+    public function cancelOrder(): void
+    {
+        $this->orderStatus = new OrderStatus(OrderStatus::CANCELLED);
+        $database = Database::getInstance();
+        $database->where('id', $this->id);
+        $database->update(self::DB_TABLE, [
+            'status' => $this->orderStatus->getValue()
+        ]);
     }
 
     #[Pure]
