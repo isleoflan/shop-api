@@ -193,7 +193,7 @@ class Invoice
 
             $pdf->setFont('changa', '', 7 * 1.4);
             $pdf->TextCell(165, $y, 10, $elementHeight, 'CHF', 'L', true);
-            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getProduct()->getCategory()->getId() == 3 ? $item->getPrice() : $item->getProduct()->getPrice()) / 100),  'R', true);
+            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getProduct()->getCategory()->getId() == 3 ? $item->getPrice() : $item->getProduct()->getPrice()) / 100,2,'.',"'"),  'R', true);
 
             $y += $elementHeight;
             $colored = !$colored;
@@ -294,7 +294,7 @@ class Invoice
 
         $pdf->setFont('ocrb10bt', '', 8);
         $pdf->setXY($columnWidth + 1.5, 191 + (14 * $rowHeight));
-        $pdf->MultiCell(22 * $columnWidth, $rowHeight, $this->getNiceReference(), $pdf->borders);
+        $pdf->MultiCell(22 * $columnWidth, $rowHeight, $this->getNiceReference(false), $pdf->borders);
 
 
         $pdf->setFont('ocrb10bt', '', 12);
