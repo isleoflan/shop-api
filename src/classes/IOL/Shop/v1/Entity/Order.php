@@ -332,8 +332,8 @@ class Order
         $specialDealCat = new \IOL\Shop\v1\Entity\Category(5);
         $specialDealCat->loadProducts();
         $specialDealID = $specialDealCat->getProducts();
-        /** @var Product $specialDeal */
-        $specialDealID = $specialDeal[0];
+        /** @var Product $specialDealID */
+        $specialDealID = $specialDealID[0];
 
         $topupCat = new \IOL\Shop\v1\Entity\Category(3);
         $topupCat->loadProducts();
@@ -347,12 +347,11 @@ class Order
             $foodItems[$product->getId()] = false;
         }
 
-        $database = Database::getInstance();
 
         foreach($this->items as $item){
             /** @var OrderItem $item */
             switch($item->getProduct()->getId()){
-                case $topupId:
+                case $topupId->getId():
                     $database->insert('transactions', [
                         'id' => UUID::newId('transactions'),
                         'value' => $item->getPrice() * -1,
@@ -360,7 +359,7 @@ class Order
                         'time' => Date::now(Date::DATETIME_FORMAT_MICRO)
                     ]);
                     break;
-                case $specialDealID:
+                case $specialDealID->getId():
                     foreach($foodItems as $foodId => $val) {
                         $database->insert('food', [
                             'user_id' => $this->userId,
