@@ -23,6 +23,8 @@ class PDF extends \FPDF
         $this->addFont('changa-bold', '', 'Changa-SemiBold.php');
         $this->addFont('changa-bold', 'B', 'Changa-Bold.php');
         $this->addFont('changa-extrabold', '', 'Changa-ExtraBold.php');
+        $this->addFont('OpenSans', '', 'OpenSans-Regular.php');
+        $this->addFont('OpenSans', 'B', 'OpenSans-Bold.php');
 
         /* HEADER */
         $this->addPage();

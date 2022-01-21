@@ -258,14 +258,14 @@ class Invoice
 
 
         for ($x = $columnWidth; $x < $columnWidth * 26; $x += (24 * $columnWidth)) {
-            $pdf->setFont('OpenSans-Regular', '', 7);
+            $pdf->setFont('OpenSans', '', 7);
             $pdf->setXY($x + $pOffset, 191 + (2 * $rowHeight));
             $pdf->MultiCell(22 * $columnWidth, 3.5, "Raiffeisenbank Mittelthurgau\r\n8570 Weinfelden", $pdf->borders);
 
             $pdf->setXY($x + $pOffset, 191 + (5 * $rowHeight));
             $pdf->MultiCell(22 * $columnWidth, 3.5, "Isle of LAN\r\n8574 Illighausen", $pdf->borders);
 
-            $pdf->setFont('OpenSans-Regular', 'B', 7);
+            $pdf->setFont('OpenSans', 'B', 7);
             $pdf->setXY($x + (10 * $columnWidth), 191 + (10.1 * $rowHeight));
             $pdf->Cell(12 * $columnWidth, $rowHeight, $this->getNiceAccount(), $pdf->borders);
 
