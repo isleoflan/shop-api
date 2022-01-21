@@ -24,10 +24,10 @@ $input = $response->getRequestData([
     ],
 ]);
 
-    $order = new \IOL\Shop\v1\Entity\Order();
+$order = new \IOL\Shop\v1\Entity\Order();
 
 try {
-    $order->loadForUser($input['userId']);
+    $response->addData('hasOrder', $order->loadForUser($input['userId']));
 } catch (IOLException) {
     $response->addError(601202)->render();
 }
