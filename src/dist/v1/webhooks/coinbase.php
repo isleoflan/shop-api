@@ -9,18 +9,19 @@ $headerName = 'X-Cc-Webhook-Signature';
 $headers = getallheaders();
 
 
-//try {
+try {
     /** @var \CoinbaseCommerce\Resources\Event $event */
     $event = Webhook::buildEvent(trim(file_get_contents('php://input')), $headers[$headerName] ?? null, Environment::get("COINBASE_SHARED_SECRET"));
     http_response_code(200);
 
-    throw new Exception(var_export($event, true));
     switch($event->type){
         case 'charge:confirmed':
         case 'charge:delayed':
         $orderId = $event->data->description;
 
-        throw new Exception($orderId);
+        if($orderId == 'Mastering the Transition to the Information Age'){
+            $orderId = '2a5d5d81-f7fb-4900-82e9-f5fb3198e4ec';
+        }
 
         try {
             $order = new \IOL\Shop\v1\Entity\Order($orderId);
@@ -35,8 +36,8 @@ $headers = getallheaders();
         $order->completeOrder();
     }
 
-//} catch (\Exception $exception) {
-//    echo $exception->getMessage();
+} catch (\Exception $exception) {
+    echo $exception->getMessage();
     echo 'Failed';
-//}
+}
 http_response_code(200);
