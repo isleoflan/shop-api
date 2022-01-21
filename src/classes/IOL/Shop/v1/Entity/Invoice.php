@@ -171,6 +171,7 @@ class Invoice
             $hideDescription = true;
         }
 
+        /** @var OrderItem $item */
         foreach ($this->order->getItems() as $item) {
             $pdf->setFillColor($colored ? 239 : 255, $colored ? 239 : 255, $colored ? 239 : 255);
             $y += $hideDescription ? 0 : ($elementHeight / 20);
@@ -189,7 +190,7 @@ class Invoice
 
             $pdf->setFont('changa', '', 7 * 1.4);
             $pdf->TextCell(165, $y, 10, $elementHeight, 'CHF', 'L', true);
-            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getPrice() * $item->getQuantity()) / 100, true), 'R', true);
+            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getPrice() * $item->getAmount()) / 100, true), 'R', true);
 
             $y += $elementHeight;
             $colored = !$colored;
