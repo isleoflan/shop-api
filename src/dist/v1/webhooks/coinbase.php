@@ -9,7 +9,7 @@ $headerName = 'X-Cc-Webhook-Signature';
 $headers = getallheaders();
 
 
-try {
+//try {
     /** @var \CoinbaseCommerce\Resources\Event $event */
     $event = Webhook::buildEvent(trim(file_get_contents('php://input')), $headers[$headerName] ?? null, Environment::get("COINBASE_SHARED_SECRET"));
     http_response_code(200);
@@ -35,8 +35,8 @@ try {
         $order->completeOrder();
     }
 
-} catch (\Exception $exception) {
-    echo $exception->getMessage();
+//} catch (\Exception $exception) {
+//    echo $exception->getMessage();
     echo 'Failed';
-}
+//}
 http_response_code(200);
