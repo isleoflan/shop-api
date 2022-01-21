@@ -37,7 +37,7 @@ class Order
     private ?Voucher $voucher = null;
     private OrderStatus $orderStatus;
 
-    private string $username;
+    public string $username;
     public array $userData;
 
     private ?Invoice $invoice = null;

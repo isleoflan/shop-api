@@ -88,11 +88,11 @@ class Ticket
 
         $pdf->setFont('changa-bold', '', 8 * 1.4);
 
-        $pdf->TextCell(14, 40, 100, 5,'[USERNAME]');
-        $pdf->TextCell(14, 45, 100, 5,'[GENDER]');
-        $pdf->TextCell(14, 50, 100, 5,'[NAME]');
-        $pdf->TextCell(14, 55, 100, 5,'[ADDRESS]');
-        $pdf->TextCell(14, 60, 100, 5,'[ZIP/CITY]');
+        $pdf->TextCell(14, 40, 100, 5,$this->order->username);
+        //$pdf->TextCell(14, 45, 100, 5,'[GENDER]');
+        $pdf->TextCell(14, 50, 100, 5,$this->order->userData['forename'].' '.$this->order->userData['lastname']);
+        $pdf->TextCell(14, 55, 100, 5,$this->order->userData['address']);
+        $pdf->TextCell(14, 60, 100, 5,$this->userData['zipCode'].' '.$this->userData['city']);
 
 
         /* TICKET DATA (TOP RIGHT) */
