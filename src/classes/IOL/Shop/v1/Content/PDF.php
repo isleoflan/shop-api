@@ -25,6 +25,7 @@ class PDF extends \FPDF
         $this->addFont('changa-extrabold', '', 'Changa-ExtraBold.php');
         $this->addFont('OpenSans', '', 'OpenSans-Regular.php');
         $this->addFont('OpenSans', 'B', 'OpenSans-Bold.php');
+        $this->addFont('ocrb10bt', '', 'ocrb10bt.php');
 
         /* HEADER */
         $this->addPage();
