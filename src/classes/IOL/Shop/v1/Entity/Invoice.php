@@ -123,7 +123,6 @@ class Invoice
         $pdf = new PDF('Rechnung #'.$this->number);
         $pdf->Image(File::getBasePath() . '/assets/images/esr_hq.png', 0, 191, 210, 106);
 
-        $pdf->TextCell(50, 15, 50, 12, '[USERNAME]');
 
         /* HEADER */
         $pdf->setFont('changa-bold', 'B', 8 * 1.4);
@@ -156,7 +155,8 @@ class Invoice
 
         /* CART */
         $pdf->setFont('changa-bold', 'B', 6 * 1.4);
-        $pdf->TextCell(16.5, 95, 160, 5, 'Artikel / Beschreibung');
+        $pdf->TextCell(16.5, 95, 10, 5, 'Anz.');
+        $pdf->TextCell(26.5, 95, 150, 5, 'Artikel / Beschreibung');
         $pdf->TextCell(165, 95, 300, 5, 'Preis');
 
         $pdf->setDrawColor(150, 150, 150);
@@ -177,6 +177,9 @@ class Invoice
             $y += $hideDescription ? 0 : ($elementHeight / 20);
             $pdf->TextCell(15, $y, 180, $elementHeight, '', 'L', true);
 
+            $pdf->setFont('changa', '', 7 * 1.4);
+            $pdf->TextCell(175, $y, 18.5, $elementHeight, $item->getAmount().'x', 'L', true);
+
             $pdf->setFont('changa-bold', 'B', 7 * 1.4);
             $pdf->TextCell(16.5, $y, 177, ($hideDescription ? $elementHeight : $elementHeight / 2), $item->getProduct()->getPaymentTitle(), 'L', true);
 
@@ -185,7 +188,7 @@ class Invoice
                 $y += ($elementHeight / 20 * 8);
                 $pdf->setFont('changa', '', 6 * 1.4);
                 $pdf->TextCell(16.5, $y, 177, $elementHeight / 2, $item->getProduct()->getPaymentDescription(), 'L', true);
-                $y -= ($elementHeight / 20 * 9);
+                $y -= ($elementHeight / 20 * 8);
             }
 
             $pdf->setFont('changa', '', 7 * 1.4);
@@ -353,12 +356,12 @@ class Invoice
         return $ret;
     }
 
-    public function getNiceReference(): string
+    public function getNiceReference($withSpace = true): string
     {
         $r = str_split(implode("", array_reverse(str_split($this->getESRReference()))), 5);
         $return = '';
         foreach ($r as $part) {
-            $return = implode("", array_reverse(str_split($part))) . " " . $return;
+            $return = implode("", array_reverse(str_split($part))) . ($withSpace ? ' ' : '') . $return;
         }
         return $return;
     }
@@ -419,6 +422,14 @@ class Invoice
         }
 
         return (10-$additional)%10;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNumber(): string
+    {
+        return $this->number;
     }
 
 

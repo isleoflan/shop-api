@@ -265,7 +265,7 @@ class Order
              ['name' => 'Telefonnummer', 'value' => '076 688 33 84'],
              ['name' => 'Empfänger', 'value' => 'Isle of LAN'],
              ['name' => 'Betrag', 'value' => 'CHF '.number_format($this->getTotal() / 100,2,".","'")],
-             ['name' => 'Nachricht', 'value' => $this->getId()],
+             ['name' => 'Nachricht', 'value' => $this->invoice->getNumber()],
         ];
         foreach($paymentinfo as $info){
             $return .= '<tr>';
@@ -343,7 +343,7 @@ class Order
             ['name' => 'zahlbar bis', 'value' => $paydate->format('d.m.Y')],
             ['name' => 'Kontonummer', 'value' => '01-7702-0'],
             ['name' => 'Bank', 'value' => 'Raiffeisenbank Mittelthurgau<br/>8570 Weinfelden'],
-            ['name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8570 Weinfelden'],
+            ['name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8574 Illighausen'],
             ['name' => 'Referenznummer', 'value' => $this->invoice->getNiceReference()],
         ];
         foreach($paymentInfo as $info){
@@ -353,7 +353,7 @@ class Order
             $return .= '</tr>';
         }
         $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-top-width: 1px; border-top-style: solid; padding: 40px 48px; border: #3e495b;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">'.$return.'</table></td></tr>';
-        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Damit deine Bestellung definitiv wird, du dein Ticket erhältst und einen Sitzplatz reservieren kannst, erwarten wir deine Vorauszahlung bis zum '.$paydate->format("d.m.Y").'. Solltest du weitere Fragen haben, schreib uns eine E-Mail an <a href="mailto:support@isleoflan.ch" style="color: #467fcf; text-decoration: none;">support@isleoflan.ch</a>.<br />Verwende für deine Zahlung einen orangen Einzahlungsschein mit folgenden Daten:</p></td></tr>'.$return;
+        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Damit deine Bestellung definitiv wird, du dein Ticket erhältst und einen Sitzplatz reservieren kannst, erwarten wir deine Vorauszahlung bis zum '.$paydate->format("d.m.Y").'. Solltest du weitere Fragen haben, schreib uns eine E-Mail an <a href="mailto:support@isleoflan.ch" style="color: #467fcf; text-decoration: none;">support@isleoflan.ch</a>.<br />Verwende für deine Zahlung einen orangen Einzahlungsschein mit folgenden Daten. Bitte drucke den Einzahlungsschein nicht aus, sondern zahle mit E-Banking. Falls du einen gedruckten Einzahlungsschein benötigst, melde dich bei uns.</p></td></tr>'.$return;
     }
 
 
