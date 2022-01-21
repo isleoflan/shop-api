@@ -178,22 +178,22 @@ class Invoice
             $pdf->TextCell(15, $y, 180, $elementHeight, '', 'L', true);
 
             $pdf->setFont('changa', '', 7 * 1.4);
-            $pdf->TextCell(175, $y, 18.5, $elementHeight, $item->getAmount().'x', 'L', true);
+            $pdf->TextCell(16.5, $y, 10, $elementHeight, ($item->getProduct()->getCategory()->getId() == 3 ? 1 : $item->getAmount()).'x', 'L', true);
 
             $pdf->setFont('changa-bold', 'B', 7 * 1.4);
-            $pdf->TextCell(16.5, $y, 177, ($hideDescription ? $elementHeight : $elementHeight / 2), $item->getProduct()->getPaymentTitle(), 'L', true);
+            $pdf->TextCell(26.5, $y, 167, ($hideDescription ? $elementHeight : $elementHeight / 2), $item->getProduct()->getPaymentTitle(), 'L', true);
 
 
             if (!$hideDescription) {
                 $y += ($elementHeight / 20 * 8);
                 $pdf->setFont('changa', '', 6 * 1.4);
-                $pdf->TextCell(16.5, $y, 177, $elementHeight / 2, $item->getProduct()->getPaymentDescription(), 'L', true);
+                $pdf->TextCell(26.5, $y, 167, $elementHeight / 2, $item->getProduct()->getPaymentDescription(), 'L', true);
                 $y -= ($elementHeight / 20 * 8);
             }
 
             $pdf->setFont('changa', '', 7 * 1.4);
             $pdf->TextCell(165, $y, 10, $elementHeight, 'CHF', 'L', true);
-            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getPrice() * $item->getAmount()) / 100, true), 'R', true);
+            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getProduct()->getCategory()->getId() == 3 ? $item->getPrice() : $item->getProduct()->getPrice()) / 100),  'R', true);
 
             $y += $elementHeight;
             $colored = !$colored;

@@ -91,10 +91,48 @@ class Order
         $this->userData = $userData;
         $this->username = $username;
 
+        $foodItemsCat = new \IOL\Shop\v1\Entity\Category(2);
+        $foodItemsCat->loadProducts();
+
+        $specialDealCat = new \IOL\Shop\v1\Entity\Category(5);
+        $specialDealCat->loadProducts();
+
+        $specialDeal = $specialDealCat->getProducts();
+        /** @var Product $specialDeal */
+        $specialDeal = $specialDeal[0];
+
+        $foodItems = [];
+        /** @var Product $product */
+        foreach($foodItemsCat->getProducts() as $product){
+            $foodItems[$product->getId()] = false;
+        }
 
         foreach($items as $sort => $item){
+            if(isset($foodItems[$item['id']])) {
+                $foodItems[$item['id']] = true;
+            }
+        }
+
+        $hasSpecialDeal = true;
+
+        foreach($foodItems as $foodItem){
+            if($foodItem === false){ $hasSpecialDeal = false; }
+        }
+
+        foreach($items as $sort => $item){
+            if($hasSpecialDeal && isset($foodItems[$item['id']])){
+                // don't add food item
+            } else {
+                $orderItem = new OrderItem();
+                $orderItem->createNew($this->id, $item, $sort);
+
+                $this->items[] = $orderItem;
+            }
+        }
+
+        if($hasSpecialDeal){
             $orderItem = new OrderItem();
-            $orderItem->createNew($this->id, $item, $sort);
+            $orderItem->createNew($this->id, ['id' => $specialDeal->getId(), 'amount' => 1], 10);
 
             $this->items[] = $orderItem;
         }
