@@ -27,7 +27,7 @@ class Crypto extends PaymentProvider implements PaymentProviderInterface
 
         $checkoutData = [
             'name' => 'Bestellung bei Isle of LAN',
-            'description' => 'Bestell-Nr. '.$order->getId(),
+            'description' => $order->getId(),
             'pricing_type' => 'fixed_price',
             'local_price' => [
                 'amount' => number_format(($order->getTotal()) / 100, 2, '.', ''),

@@ -37,49 +37,53 @@ if($output->getVerificationStatus() === 'SUCCESS') {
     // signature is valid
 
     $data = json_decode($requestBody, true);
-    $orderId = $data['resource']['transactions'][0]['invoice_number'];
-    $paymentId = $data['resource']['id'];
-    $payerId = $data['resource']['payer']['payer_info']['payer_id'];
+
+    if($data['event_type'] === 'PAYMENTS.PAYMENT.CREATED') {
+        $orderId = $data['resource']['transactions'][0]['invoice_number'];
+        $paymentId = $data['resource']['id'];
+        $payerId = $data['resource']['payer']['payer_info']['payer_id'];
 
 
-    try {
-        $order = new \IOL\Shop\v1\Entity\Order($orderId);
-    } catch (\IOL\Shop\v1\Exceptions\IOLException) {}
+        try {
+            $order = new \IOL\Shop\v1\Entity\Order($orderId);
+        } catch (\IOL\Shop\v1\Exceptions\IOLException) {
+        }
 
-    $payment = \PayPal\Api\Payment::get($paymentId, $apiContext);
+        $payment = \PayPal\Api\Payment::get($paymentId, $apiContext);
 
-    $execution = new \PayPal\Api\PaymentExecution();
-    $execution->setPayerId($payerId);
-
-
-    $total = $order->getTotal() / 100;
+        $execution = new \PayPal\Api\PaymentExecution();
+        $execution->setPayerId($payerId);
 
 
-    $transaction = new \PayPal\Api\Transaction();
-    $amount = new \PayPal\Api\Amount();
-    $details = new \PayPal\Api\Details();
+        $total = $order->getTotal() / 100;
 
-    $details->setSubtotal(number_format($total,2,".","'"));
 
-    $amount->setCurrency('CHF');
-    $amount->setTotal(number_format($total, 2,".","'"));
-    $amount->setDetails($details);
-    $transaction->setAmount($amount);
-    $execution->addTransaction($transaction);
+        $transaction = new \PayPal\Api\Transaction();
+        $amount = new \PayPal\Api\Amount();
+        $details = new \PayPal\Api\Details();
 
-    try {
-        $result = $payment->execute($execution, $apiContext);
-    } catch(Exception $e){}
+        $details->setSubtotal(number_format($total, 2, ".", "'"));
 
-    $invoice = new \IOL\Shop\v1\Entity\Invoice();
-    $invoice->getForOrder($order);
+        $amount->setCurrency('CHF');
+        $amount->setTotal(number_format($total, 2, ".", "'"));
+        $amount->setDetails($details);
+        $transaction->setAmount($amount);
+        $execution->addTransaction($transaction);
 
-    $invoice->createPayment($invoice->getValue());
-    $order->sendConfirmationMail();
+        try {
+            $result = $payment->execute($execution, $apiContext);
+        } catch (Exception $e) {
+        }
 
-    $order->completeOrder();
+        $invoice = new \IOL\Shop\v1\Entity\Invoice();
+        $invoice->getForOrder($order);
+
+        $invoice->createPayment($invoice->getValue());
+        $order->sendConfirmationMail();
+
+        $order->completeOrder();
+    }
     http_response_code(200);
-
 } else {
     http_response_code(400);
 }
