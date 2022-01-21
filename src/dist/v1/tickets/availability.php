@@ -13,9 +13,7 @@ $response->setAllowedRequestMethods(
 );
 $response->needsAuth(false);
 
-$response->setData([
-    'total' => 80,
-    'sold' => 34,
-    'reserved' => 8,
-    'free' => 38,
-]);
+$order = new \IOL\Shop\v1\Entity\Order();
+
+
+$response->setData($order->getCounts());

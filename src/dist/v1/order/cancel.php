@@ -10,7 +10,7 @@ use IOL\Shop\v1\Request\APIResponse;
 $response = APIResponse::getInstance();
 
 $response->setAllowedRequestMethods(
-    new RequestMethod(RequestMethod::POST)
+    new RequestMethod(RequestMethod::DELETE)
 );
 $response->needsAuth(true);
 

@@ -28,6 +28,8 @@ class Order
 {
     public const DB_TABLE = 'orders';
 
+    public const MAX_TICKETS = 80;
+
     private string $id;
     private string $userId;
     private Date $created;
@@ -470,6 +472,33 @@ class Order
     public function getUserId(): string
     {
         return $this->userId;
+    }
+
+    public function getCounts(): array
+    {
+        $database = Database::getInstance();
+        $database->where('status', OrderStatus::CANCELLED, '<>');
+        $data = $database->get(self::DB_TABLE);
+
+        $finished = 0;
+        $created = 0;
+
+        foreach($data as $order){
+            switch($order['status']){
+                case OrderStatus::FINISHED:
+                    $finished++;
+                    break;
+                case OrderStatus::CREATED:
+                    $created++;
+            }
+        }
+
+        return [
+            'total' => self::MAX_TICKETS,
+            'sold' => $finished,
+            'reserved' => $created,
+            'free' => self::MAX_TICKETS - $finished - $created,
+        ];
     }
 
 
