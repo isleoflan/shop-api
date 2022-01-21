@@ -65,6 +65,7 @@ class Order
         $this->userId = $values['user_id'];
         $this->created = new Date($values['created']);
         $this->paymentMethod = new PaymentMethod($values['payment_method']);
+        $this->orderStatus = new OrderStatus($values['status']);
         $this->username = $values['username'];
         $this->userData = json_decode($values['userdata'], true);
         $this->loadItems();
