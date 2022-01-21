@@ -204,6 +204,10 @@ class Order
 
         if($this->paymentMethod->getValue() === PaymentMethod::PREPAYMENT){
             $this->sendConfirmationMail();
+
+            if($this->getTotal() === 0){
+                $this->completeOrder();
+            }
         }
 
         return $redirect;
