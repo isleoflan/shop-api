@@ -35,6 +35,9 @@ class Order
     private ?Voucher $voucher = null;
     private OrderStatus $orderStatus;
 
+    private string $username;
+    public array $userData;
+
     private ?Invoice $invoice = null;
 
     private array $items = [];
@@ -60,6 +63,8 @@ class Order
         $this->userId = $values['user_id'];
         $this->created = new Date($values['created']);
         $this->paymentMethod = new PaymentMethod($values['payment_method']);
+        $this->username = $values['username'];
+        $this->userData = json_decode($values['userdata'], true);
         $this->loadItems();
     }
 
@@ -75,7 +80,7 @@ class Order
         }
     }
 
-    public function createNew(string $userId, array $items, PaymentMethod $paymentMethod, ?Voucher $voucher): string
+    public function createNew(string $userId, array $items, PaymentMethod $paymentMethod, string $username, array $userData, ?Voucher $voucher): string
     {
         $this->id = UUID::newId(self::DB_TABLE);
         $this->userId = $userId;
@@ -83,6 +88,8 @@ class Order
         $this->paymentMethod = $paymentMethod;
         $this->voucher = $voucher;
         $this->orderStatus = new OrderStatus(OrderStatus::CREATED);
+        $this->userData = $userData;
+        $this->username = $username;
 
 
         foreach($items as $sort => $item){
@@ -103,7 +110,9 @@ class Order
             'created' => $this->created->format(Date::DATETIME_FORMAT_MICRO),
             'payment_method' => $this->paymentMethod->getValue(),
             'voucher' => is_null($this->voucher) ? null : $this->voucher->getCode(),
-            'status' => $this->orderStatus->getValue()
+            'status' => $this->orderStatus->getValue(),
+            'username' => $this->username,
+            'userdata' => json_encode($this->userData)
         ]);
 
         switch($this->paymentMethod->getValue()){
@@ -121,16 +130,20 @@ class Order
                 break;
         }
 
+
         $externalId = $paymentProvider->createPayment($this);
         $redirect = $paymentProvider->getPaymentLink();
 
         $invoice = new Invoice();
         $invoice->createNew($this, $externalId);
-
         $this->invoice = $invoice;
 
         if($this->hasValidVoucher()){
             $this->voucher->consume();
+        }
+
+        if($this->paymentMethod->getValue() === PaymentMethod::PREPAYMENT){
+            $this->sendConfirmationMail();
         }
 
         return $redirect;
@@ -181,11 +194,14 @@ class Order
             $mail->setReceiver(new Email('stevebitzi@gmail.com'));
             $mail->setSubject('Deine Ticketbestellung für Isle of LAN 2022');
             $mail->addVariable('preheader', '');
-            $mail->addVariable('name', 'Testname'); //
+            $mail->addVariable('name', $this->userData['forename']); //
             $mail->addVariable('orderid', $this->getId());
             $mail->addVariable('orderdate', $this->created->format("d.m.Y"));
-            //$mail->addVariable('orderaddress', implode("<br />",$user->getAddressArray()));
-            $mail->addVariable('orderaddress', 'Address goes here');
+            $mail->addVariable('orderaddress', implode("<br />",[
+                $this->userData['forename'].' '.$this->userData['lastname'],
+                $this->userData['address'],
+                $this->userData['zipCode'].' '.$this->userData['city']
+            ]));
             $mail->addVariable('cart', $this->getMailCart());
             $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
 
@@ -195,8 +211,8 @@ class Order
                         $mail->addAttachment($this->generateTicket());
                         $mail->addVariable('paymentdetails', '');
                     } else {
-                        //$mail->addAttachment($this->generateInvoice());
-                        //$mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
+                        $mail->addAttachment($this->generateInvoice());
+                        $mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
                     }
                     break;
                 case PaymentMethod::STRIPE:
@@ -224,6 +240,12 @@ class Order
         $ticket = new Ticket();
         $ticket->createNew($this);
         return $ticket->generatePDF();
+    }
+
+    #[Pure]
+    private function generateInvoice(): string
+    {
+        return $this->invoice->generatePDF();
     }
 
     public function completeOrder(): void
@@ -300,6 +322,41 @@ class Order
         return $return;
     }
 
+    private function getMailPaymentInfo(){
+        $return = '';
+        $paydate = new Date();
+        $paydate->add(new \DateInterval("P20D"));
+
+
+        /* $paymentinfo = array(
+            array('name' => 'offener Betrag', 'value' => 'CHF '.number_format($this->getTotal(),2,".","'")),
+            array('name' => 'zahlbar bis', 'value' => $paydate->format("d.m.Y")),
+            array('name' => 'IBAN', 'value' => 'CH46 8080 8003 7466 1292 7'),
+            array('name' => 'Kontonummer', 'value' => '85-4611-9'),
+            array('name' => 'Bank', 'value' => 'Raiffeisenbank Mittelthurgau<br/>8570 Weinfelden'),
+            array('name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8570 Weinfelden'),
+            array('name' => 'Zahlungszweck', 'value' => $this->getId()),
+        ); */
+
+        $paymentInfo = [
+            ['name' => 'offener Betrag', 'value' => 'CHF '.number_format($this->getTotal() / 100,2,".","'")],
+            ['name' => 'zahlbar bis', 'value' => $paydate->format('d.m.Y')],
+            ['name' => 'Kontonummer', 'value' => '01-7702-0'],
+            ['name' => 'Bank', 'value' => 'Raiffeisenbank Mittelthurgau<br/>8570 Weinfelden'],
+            ['name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8570 Weinfelden'],
+            ['name' => 'Referenznummer', 'value' => $this->invoice->getNiceReference()],
+        ];
+        foreach($paymentInfo as $info){
+            $return .= '<tr>';
+            $return .= '<td style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 12px 4px 0;">'.$info['name'].'</td>';
+            $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 12px;" align="right"><strong style="font-weight: 600;">'.str_replace(' ','&nbsp;',$info['value']).'</strong></td>';
+            $return .= '</tr>';
+        }
+        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-top-width: 1px; border-top-style: solid; padding: 40px 48px; border: #3e495b;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">'.$return.'</table></td></tr>';
+        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Damit deine Bestellung definitiv wird, du dein Ticket erhältst und einen Sitzplatz reservieren kannst, erwarten wir deine Vorauszahlung bis zum '.$paydate->format("d.m.Y").'. Solltest du weitere Fragen haben, schreib uns eine E-Mail an <a href="mailto:support@isleoflan.ch" style="color: #467fcf; text-decoration: none;">support@isleoflan.ch</a>.<br />Verwende für deine Zahlung einen orangen Einzahlungsschein mit folgenden Daten:</p></td></tr>'.$return;
+    }
+
+
     /**
      * @return string
      */
@@ -347,6 +404,7 @@ class Order
     {
         return $this->userId;
     }
+
 
 
 }

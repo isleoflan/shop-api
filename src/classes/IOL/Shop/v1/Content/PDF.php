@@ -40,10 +40,10 @@ class PDF extends \FPDF
         }
     }
 
-    public function TextCell($x, $y, $w, $h, $text, $align = 'L')
+    public function TextCell($x, $y, $w, $h, $text, $align = 'L', $fill = false)
     {
         $this->setXY($x, $y);
-        $this->Cell($w, $h, utf8_decode($text), $this->borders, 0, $align);
+        $this->Cell($w, $h, utf8_decode($text), $this->borders, 0, $align, $fill);
     }
 
     public function SetDash($black=null, $white=null)

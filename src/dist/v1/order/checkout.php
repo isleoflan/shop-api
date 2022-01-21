@@ -40,6 +40,12 @@ $input = $response->getRequestData([
         'required' => false,
         'errorCode' => 601104,
     ],
+    [
+        'name' => 'username',
+        'types' => ['string'],
+        'required' => true,
+        'errorCode' => 601105,
+    ],
 ]);
 
 foreach (
@@ -90,6 +96,6 @@ if(isset($input['voucher']) && $input['voucher'] !== ''){
 
 
 $order = new \IOL\Shop\v1\Entity\Order();
-$redirect = $order->createNew($userID, $input['cart'], $paymentMethod, $voucher);
+$redirect = $order->createNew($userID, $input['cart'], $paymentMethod, $input['username'], $input['user'], $voucher);
 
 $response->addData('redirect', $redirect);

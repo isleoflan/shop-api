@@ -198,6 +198,10 @@
     "message": "Voucher has already been used",
     "errorCode": 400
   },
+  "601106": {
+    "message": "Field username missing or invalid",
+    "errorCode": 400
+  },
 
 
 
