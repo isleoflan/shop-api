@@ -17,23 +17,28 @@ try {
     switch($event->type){
         case 'charge:confirmed':
         case 'charge:delayed':
-        $orderId = $event->data->description;
 
-        if($orderId == 'Mastering the Transition to the Information Age'){
-            $orderId = '2a5d5d81-f7fb-4900-82e9-f5fb3198e4ec';
-        }
+            //TODO: if delayed, a underpay is possible
+            $orderId = $event->data->description;
 
-        try {
-            $order = new \IOL\Shop\v1\Entity\Order($orderId);
-        } catch (\IOL\Shop\v1\Exceptions\IOLException) {}
+            if($orderId == 'Mastering the Transition to the Information Age'){
+                $orderId = '2a5d5d81-f7fb-4900-82e9-f5fb3198e4ec';
+            }
 
-        $invoice = new \IOL\Shop\v1\Entity\Invoice();
-        $invoice->getForOrder($order);
+            try {
+                $order = new \IOL\Shop\v1\Entity\Order($orderId);
+            } catch (\IOL\Shop\v1\Exceptions\IOLException) {}
 
-        $invoice->createPayment($invoice->getValue());
-        $order->sendConfirmationMail();
+            $invoice = new \IOL\Shop\v1\Entity\Invoice();
+            $invoice->getForOrder($order);
 
-        $order->completeOrder();
+            $invoice->createPayment($invoice->getValue());
+            $order->sendConfirmationMail();
+
+            $order->completeOrder();
+            break;
+        case 'charge:failed':
+            // TODO: cancel charge
     }
 
 } catch (\Exception $exception) {
