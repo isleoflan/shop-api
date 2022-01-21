@@ -210,7 +210,62 @@ class Order
             }
         }
 
+        $this->sendDiscordWebhook();
+
         return $redirect;
+    }
+
+    public function sendDiscordWebhook(): void
+    {
+        $data = [
+            'embeds' => [
+                [
+                    'title'			=> 'Neue Bestellung',
+                    'description'	=> 'Im IOL Shop ist eine neue Bestellung eingegangen',
+                    'color'			=> '11475628',
+                    'fields'		=> [
+                        [
+                            'name'		=> 'Bestell-Nr',
+                            'value'		=> $this->id,
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Gekauft von',
+                            'value'		=> $this->username,
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Bezahlt mit',
+                            'value'		=> $this->paymentMethod->getPrettyValue(),
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Betrag',
+                            'value'		=> 'CHF '.number_format($this->getTotal(),2,'.',"'"),
+                            'inline'	=> true,
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        $itemData = [];
+        /** @var OrderItem $item */
+        foreach($this->items as $item){
+            $itemData[] = ($item->getProduct()->getCategory()->getId() == 3 ? 1 : $item->getAmount()).'x '.$item->getProduct()->getTitle();
+        }
+        $data['embeds']['fields'][] = implode('\r\n', $itemData);
+
+        $data = json_encode($data);
+
+        $discordRequest = curl_init(Environment::get('DISCORD_WEBHOOK_URL'));
+        $headers = ['Content-Type: application/json'];
+
+        curl_setopt($discordRequest, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($discordRequest, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($discordRequest, CURLOPT_POST, true);
+        curl_setopt($discordRequest, CURLOPT_POSTFIELDS, $data);
+        curl_exec($discordRequest);
     }
 
     public function getSubtotal(): int
