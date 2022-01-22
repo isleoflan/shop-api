@@ -32,6 +32,8 @@ try {
     $output = $signatureVerification->post($apiContext);
 } catch (Exception $ex) {
     http_response_code(400);
+    error_log($ex->getMessage());
+    die;
 }
 if($output->getVerificationStatus() === 'SUCCESS') {
     // signature is valid
