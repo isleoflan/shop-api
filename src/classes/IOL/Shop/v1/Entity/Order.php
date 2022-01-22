@@ -369,7 +369,7 @@ class Order
         }
     }
 
-    public function sendPaymentMail(int $payedValue): void
+    public function sendPaymentMail(int $payedValue, Invoice $invoice): void
     {
         $mail = new Mail();
         $mail->setTemplate('payment');
@@ -379,15 +379,15 @@ class Order
         $mail->addVariable('paymentvalue', number_format($payedValue / 100, 2,'.',"'"));
         $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
         $mail->addVariable('paymenttext',
-            ($this->invoice->isFullyPayed()) ?
+            ($invoice->isFullyPayed()) ?
                 'Vielen Dank, deine Zahlung ist komplett!'.($this->hasTicket() ? ' Anbei erhältst du dein Ticket!' : '') :
-                'Bis zur kompletten Zahlung fehlen noch CHF '.number_format(($this->invoice->getValue() - $this->invoice->getTotalPayed()) / 100, 2, ".", "'")
+                'Bis zur kompletten Zahlung fehlen noch CHF '.number_format(($invoice->getValue() - $invoice->getTotalPayed()) / 100, 2, ".", "'")
         );
-        $mail->addVariable('payedpercentage', number_format(($this->invoice->getTotalPayed() / $this->invoice->getValue()) * 100, 2,'.',''));
-        $mail->addVariable('totalpayed', number_format($this->invoice->getTotalPayed() / 100, 2,'.',"'"));
-        $mail->addVariable('totaldue', number_format($this->invoice->getValue() / 100, 2,'.',"'"));
+        $mail->addVariable('payedpercentage', number_format(($invoice->getTotalPayed() / $invoice->getValue()) * 100, 2,'.',''));
+        $mail->addVariable('totalpayed', number_format($invoice->getTotalPayed() / 100, 2,'.',"'"));
+        $mail->addVariable('totaldue', number_format($invoice->getValue() / 100, 2,'.',"'"));
 
-        if($this->invoice->isFullyPayed()){
+        if($invoice->isFullyPayed()){
             if($this->hasTicket()){
                 $mail->addAttachment($this->generateTicket());
             }

@@ -53,7 +53,7 @@ try {
 $invoice->createPayment((int)$input['value']);
 
 $order = $invoice->getOrder();
-$order->sendPaymentMail((int)$input['value']);
+$order->sendPaymentMail((int)$input['value'], $invoice);
 
 if($invoice->isFullyPayed()) {
     $order->completeOrder();
