@@ -50,10 +50,10 @@ try {
 }
 
 
-$invoice->createPayment($input['value']);
+$invoice->createPayment((int)$input['value']);
 
 $order = $invoice->getOrder();
-$order->sendPaymentMail($input['value']);
+$order->sendPaymentMail((int)$input['value']);
 
 if($invoice->isFullyPayed()) {
     $order->completeOrder();
