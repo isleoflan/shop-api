@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
+
 use IOL\Shop\v1\DataSource\Environment;
 use PayPal\Api\VerifyWebhookSignature;
 
@@ -88,6 +90,8 @@ if($output->getVerificationStatus() === 'SUCCESS') {
     http_response_code(200);
 } else {
     http_response_code(400);
+    error_log('PayPal Verification failed');
+    die;
 }
 
 
