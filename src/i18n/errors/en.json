@@ -229,6 +229,19 @@
   },
 
 
+  "991001": {
+    "message": "Field invoiceNumber missing or invalid",
+    "errorCode": 400
+  },
+  "991002": {
+    "message": "Field value missing or invalid",
+    "errorCode": 400
+  },
+  "991999": {
+    "message": "This user does not have the permission to perform this action",
+    "errorCode": 400
+  },
+
   "999101": {
     "message": "General Server Error",
     "errorCode": 500

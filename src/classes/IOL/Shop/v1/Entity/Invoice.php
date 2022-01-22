@@ -29,13 +29,16 @@ class Invoice
      * @throws NotFoundException
      * @throws InvalidValueException
      */
-    public function __construct(?string $id = null)
+    public function __construct(?string $id = null, ?int $number = null)
     {
         if (!is_null($id)) {
             if (!UUID::isValid($id)) {
                 throw new InvalidValueException('Invalid Invoice ID');
             }
             $this->loadData(Database::getRow('id', $id, self::DB_TABLE));
+        }
+        if (!is_null($number)) {
+            $this->loadData(Database::getRow('number', $number, self::DB_TABLE));
         }
     }
 
@@ -48,6 +51,35 @@ class Invoice
         $database->where('order_id', $order->getId());
         $row = $database->get(self::DB_TABLE, 1);
         $this->loadData($row[0]);
+    }
+
+    public function isFullyPayed(): bool
+    {
+        return $this->getTotalPayed() >= $this->getValue();
+    }
+
+    public function getAllPayments(): array
+    {
+        $database = Database::getInstance();
+        $database->where('invoice_id', $this->id);
+
+        $payments = [];
+        foreach($database->get(Payment::DB_TABLE) as $paymentData){
+            $payment = new Payment();
+            $payment->loadData($paymentData);
+            $payments[] = $payment;
+        }
+        return $payments;
+    }
+
+    public function getTotalPayed(): int
+    {
+        $total = 0;
+        /** @var Payment $payment */
+        foreach($this->getAllPayments() as $payment){
+            $total += $payment->getValue();
+        }
+        return $total;
     }
 
     /**
@@ -430,6 +462,14 @@ class Invoice
     public function getNumber(): string
     {
         return $this->number;
+    }
+
+    /**
+     * @return Order
+     */
+    public function getOrder(): Order
+    {
+        return $this->order;
     }
 
 

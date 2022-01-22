@@ -31,7 +31,7 @@ class Payment
      * @throws NotFoundException
      * @throws InvalidValueException
      */
-    private function loadData(array|false $values): void
+    public function loadData(array|false $values): void
     {
 
         if (!$values || count($values) === 0) {

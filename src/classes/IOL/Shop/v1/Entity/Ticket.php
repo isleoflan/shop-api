@@ -184,7 +184,7 @@ class Ticket
         $pdf->setXY(15, 170);
         $pdf->MultiCell(85, 5, utf8_decode("1. Drucke dieses Ticket aus und nimm es mit zum Check-In. Lass vorerst bitte alles im Auto, wenn du zum Check-In kommst.\r\n\r\n2. Als erstes müssen wir von dir ein COVID-Zertifikat (2G+) sehen. Dieses wird dann überprüft. Halte hierzu bitte das Zertifikat und einen Ausweis bereit.\r\n\r\n"), $pdf->borders, 'L');
         $pdf->setXY(110, 170);
-        $pdf->MultiCell(85, 5, utf8_decode("3. Anschliessend wird am Check-In-Schalter wird dein Ticket überprüft. Wenn alles stimmt, erhältst du dein Eintrittsband, welches an deinem Handgelenk festgemacht wird. Bitte lass es während der Isle of LAN immer an, du benötigst es auch, um dir etwas am Kiosk zu kaufen.\r\n\r\n4. Suche den Platz, den du reserviert hast, bringe anschliessend dein Material dort hin und richte dich ein. Wenn du Hilfe brauchst, zögere nicht, eine Person mit einem Staff T-Shirt anzusprechen."), $pdf->borders, 'L');
+        $pdf->MultiCell(85, 5, utf8_decode("3. Anschliessend wird am Check-In-Schalter dein Ticket überprüft. Wenn alles stimmt, erhältst du dein Eintrittsband, welches an deinem Handgelenk festgemacht wird. Bitte lass es während der Isle of LAN immer an, du benötigst es auch, um dir etwas am Kiosk zu kaufen.\r\n\r\n4. Suche den Platz, den du reserviert hast, bringe anschliessend dein Material dort hin und richte dich ein. Wenn du Hilfe brauchst, zögere nicht, eine Person mit einem Staff T-Shirt anzusprechen."), $pdf->borders, 'L');
 
 
         $pdf->SetLineWidth(0.5);

@@ -83,6 +83,27 @@ class Order
         }
     }
 
+    public function hasTicket(): bool
+    {
+        $ticketCat = new \IOL\Shop\v1\Entity\Category(1);
+        $ticketCat->loadProducts();
+        $ticketIds = [];
+
+        /** @var Product $ticketProduct */
+        foreach($ticketCat->getProducts() as $ticketProduct){
+            $ticketIds[] = $ticketProduct->getId();
+        }
+
+        /** @var OrderItem $item */
+        foreach($this->items as $item){
+            if(in_array($item->getProduct()->getId(), $ticketIds)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @throws NotFoundException
      * @throws InvalidValueException
@@ -346,6 +367,34 @@ class Order
             $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
             $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
         }
+    }
+
+    public function sendPaymentMail(int $payedValue): void
+    {
+        $mail = new Mail();
+        $mail->setTemplate('payment');
+        $mail->setReceiver(new Email($this->userData['email']));
+        $mail->setSubject('Deine Bezahlung für Isle of LAN ist angekommen!');
+        $mail->addVariable('preheader', 'Danke für deine Bezahlung');
+        $mail->addVariable('paymentvalue', number_format($payedValue / 100, 2,'.',"'"));
+        $mail->addVariable('paymentmethod', $this->paymentMethod->getPrettyValue());
+        $mail->addVariable('paymenttext',
+            ($this->invoice->isFullyPayed()) ?
+                'Vielen Dank, deine Zahlung ist komplett!'.($this->hasTicket() ? ' Anbei erhältst du dein Ticket!' : '') :
+                'Bis zur kompletten Zahlung fehlen noch CHF '.number_format(($this->invoice->getValue() - $this->invoice->getTotalPayed()) / 100, 2, ".", "'")
+        );
+        $mail->addVariable('payedpercentage', number_format(($this->invoice->getTotalPayed() / $this->invoice->getValue()) * 100, 2,'.',''));
+        $mail->addVariable('totalpayed', number_format($this->invoice->getTotalPayed() / 100, 2,'.',"'"));
+        $mail->addVariable('totaldue', number_format($this->invoice->getValue() / 100, 2,'.',"'"));
+
+        if($this->invoice->isFullyPayed()){
+            if($this->hasTicket()){
+                $mail->addAttachment($this->generateTicket());
+            }
+        }
+
+        $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
+        $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
     }
 
     public function cancelOrder(): void
