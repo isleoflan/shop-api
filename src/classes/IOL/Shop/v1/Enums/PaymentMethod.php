@@ -9,6 +9,7 @@ use JetBrains\PhpStorm\Pure;
 class PaymentMethod extends Enum
 {
     public const PREPAYMENT = 'PREPAYMENT';
+    public const TWINT = 'TWINT';
     public const STRIPE = 'STRIPE';
     public const PAYPAL = 'PAYPAL';
     public const CRYPTO = 'CRYPTO';
@@ -18,6 +19,7 @@ class PaymentMethod extends Enum
     {
         return match($this->getValue()) {
             PaymentMethod::PREPAYMENT => 'Vorauskasse',
+            PaymentMethod::TWINT => 'TWINT',
             PaymentMethod::CRYPTO => 'Kryptowährungen',
             PaymentMethod::PAYPAL => 'PayPal',
             PaymentMethod::STRIPE => 'Kreditkarte'
