@@ -241,7 +241,7 @@ class Order
                         ],
                         [
                             'name'		=> 'Betrag',
-                            'value'		=> 'CHF '.number_format($this->getTotal(),2,'.',"'"),
+                            'value'		=> 'CHF '.number_format($this->getTotal() / 100,2,'.',"'"),
                             'inline'	=> true,
                         ],
                     ],
