@@ -6,6 +6,8 @@ use IOL\Shop\v1\BitMasks\RequestMethod;
 use IOL\Shop\v1\Entity\Voucher;
 use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Request\APIResponse;
+use IOL\SSO\SDK\Client;
+use IOL\SSO\SDK\Service\User;
 
 $response = APIResponse::getInstance();
 
