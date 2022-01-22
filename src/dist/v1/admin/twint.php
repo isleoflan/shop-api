@@ -20,7 +20,7 @@ $userID = $response->check();
 $input = $response->getRequestData([
     [
         'name' => 'invoiceNumber',
-        'types' => ['string'],
+        'types' => ['integer'],
         'required' => true,
         'errorCode' => 991001,
     ],
