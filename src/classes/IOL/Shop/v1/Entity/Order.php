@@ -385,7 +385,7 @@ class Order
         );
         $mail->addVariable('payedpercentage', number_format(($invoice->getTotalPayed() / $invoice->getValue()) * 100, 2,'.',''));
         $mail->addVariable('totalpayed', number_format($invoice->getTotalPayed() / 100, 2,'.',"'"));
-        $mail->addVariable('totaldue', number_format($invoice->getValue() / 100, 2,'.',"'"));
+        $mail->addVariable('totaldue', number_format(($invoice->getValue() - $invoice->getTotalPayed()) / 100, 2,'.',"'"));
 
         if($invoice->isFullyPayed()){
             if($this->hasTicket()){
