@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IOL\Shop\v1\Entity;
 
+use DateInterval;
 use IOL\Shop\v1\Content\Mail;
 use IOL\Shop\v1\DataSource\Database;
 use IOL\Shop\v1\DataSource\Environment;
@@ -15,13 +16,12 @@ use IOL\Shop\v1\Enums\OrderStatus;
 use IOL\Shop\v1\Enums\PaymentMethod;
 use IOL\Shop\v1\Enums\QueueType;
 use IOL\Shop\v1\Exceptions\InvalidValueException;
-use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Exceptions\NotFoundException;
 use IOL\Shop\v1\PaymentProvider\Crypto;
 use IOL\Shop\v1\PaymentProvider\PayPal;
 use IOL\Shop\v1\PaymentProvider\Prepayment;
 use IOL\Shop\v1\PaymentProvider\Stripe;
-use IOL\Shop\v1\Request\APIResponse;
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 class Order
@@ -85,7 +85,7 @@ class Order
 
     public function hasTicket(): bool
     {
-        $ticketCat = new \IOL\Shop\v1\Entity\Category(1);
+        $ticketCat = new Category(1);
         $ticketCat->loadProducts();
         $ticketIds = [];
 
@@ -114,7 +114,7 @@ class Order
             throw new InvalidValueException('Invalid User ID');
         }
         $database = Database::getInstance();
-        $data = $database->query('SELECT * FROM '.self::DB_TABLE.' WHERE user_id = "'.$userId.'" AND (status = "'.OrderStatus::CREATED.'" OR status = "'.OrderStatus::FINISHED.'") LIMIT 1');
+        $data = $database->query('SELECT * FROM '.self::DB_TABLE.' WHERE user_id = \''.$userId.'\' AND (status = "'.OrderStatus::CREATED.'" OR status = \''.OrderStatus::FINISHED.'\') LIMIT 1');
         if(isset($data[0])){
             $this->loadData($data[0]);
             return true;
@@ -134,10 +134,10 @@ class Order
         $this->userData = $userData;
         $this->username = $username;
 
-        $foodItemsCat = new \IOL\Shop\v1\Entity\Category(2);
+        $foodItemsCat = new Category(2);
         $foodItemsCat->loadProducts();
 
-        $specialDealCat = new \IOL\Shop\v1\Entity\Category(5);
+        $specialDealCat = new Category(5);
         $specialDealCat->loadProducts();
 
         $specialDeal = $specialDealCat->getProducts();
@@ -150,7 +150,7 @@ class Order
             $foodItems[$product->getId()] = false;
         }
 
-        foreach($items as $sort => $item){
+        foreach($items as $item){
             if(isset($foodItems[$item['id']])) {
                 $foodItems[$item['id']] = true;
             }
@@ -197,6 +197,7 @@ class Order
         ]);
 
         switch($this->paymentMethod->getValue()){
+            default:
             case PaymentMethod::PREPAYMENT:
                 $paymentProvider = new Prepayment();
                 break;
@@ -303,20 +304,12 @@ class Order
 
     public function getFees(): int
     {
-        switch($this->paymentMethod->getValue()){
-            case PaymentMethod::PREPAYMENT:
-                $paymentMethod = new Prepayment();
-                break;
-            case PaymentMethod::STRIPE:
-                $paymentMethod = new Stripe();
-                break;
-            case PaymentMethod::PAYPAL:
-                $paymentMethod = new PayPal();
-                break;
-            case PaymentMethod::CRYPTO:
-                $paymentMethod = new Crypto();
-                break;
-        }
+        $paymentMethod = match ($this->paymentMethod->getValue()) {
+            PaymentMethod::PREPAYMENT => new Prepayment(),
+            PaymentMethod::STRIPE => new Stripe(),
+            PaymentMethod::PAYPAL => new PayPal(),
+            PaymentMethod::CRYPTO => new Crypto(),
+        };
 
         return $paymentMethod->getFees($this->getSubtotal());
     }
@@ -420,7 +413,6 @@ class Order
         return $ticket->generatePDF();
     }
 
-    #[Pure]
     private function generateInvoice(): string
     {
         return $this->invoice->generatePDF();
@@ -434,16 +426,16 @@ class Order
         $database->update(self::DB_TABLE, [
             'status' => $this->orderStatus->getValue()
         ]);
-        $foodItemsCat = new \IOL\Shop\v1\Entity\Category(2);
+        $foodItemsCat = new Category(2);
         $foodItemsCat->loadProducts();
 
-        $specialDealCat = new \IOL\Shop\v1\Entity\Category(5);
+        $specialDealCat = new Category(5);
         $specialDealCat->loadProducts();
         $specialDealID = $specialDealCat->getProducts();
         /** @var Product $specialDealID */
         $specialDealID = $specialDealID[0];
 
-        $topupCat = new \IOL\Shop\v1\Entity\Category(3);
+        $topupCat = new Category(3);
         $topupCat->loadProducts();
         $topupId = $topupCat->getProducts();
         /** @var Product $topupId */
@@ -503,7 +495,7 @@ class Order
             $return .= '</tr>';
         }
 
-        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-top-width: 1px; border-top-style: solid; padding: 40px 48px; border: #3e495b;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">'.$return.'</table></td></tr>';
+        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px; border-color: #3e495b;border-top: 1px solid;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">' .$return.'</table></td></tr>';
         return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Du kannst auch ganz bequem mit TWINT bezahlen. Sende hierzu einfach eine Zahlung an:</p></td></tr>'.$return;
     }
 
@@ -551,38 +543,30 @@ class Order
         return $return;
     }
 
-    private function getMailPaymentInfo(){
+    private function getMailPaymentInfo(): string
+    {
         $return = '';
-        $paydate = new Date();
-        $paydate->add(new \DateInterval("P20D"));
-
-
-        /* $paymentinfo = array(
-            array('name' => 'offener Betrag', 'value' => 'CHF '.number_format($this->getTotal(),2,".","'")),
-            array('name' => 'zahlbar bis', 'value' => $paydate->format("d.m.Y")),
-            array('name' => 'IBAN', 'value' => 'CH46 8080 8003 7466 1292 7'),
-            array('name' => 'Kontonummer', 'value' => '85-4611-9'),
-            array('name' => 'Bank', 'value' => 'Raiffeisenbank Mittelthurgau<br/>8570 Weinfelden'),
-            array('name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8570 Weinfelden'),
-            array('name' => 'Zahlungszweck', 'value' => $this->getId()),
-        ); */
+        $payDate = new Date();
+        $payDate->add(new DateInterval("P20D"));
 
         $paymentInfo = [
             ['name' => 'offener Betrag', 'value' => 'CHF '.number_format($this->getTotal() / 100,2,".","'")],
-            ['name' => 'zahlbar bis', 'value' => $paydate->format('d.m.Y')],
+            ['name' => 'zahlbar bis', 'value' => $payDate->format('d.m.Y')],
             ['name' => 'Kontonummer', 'value' => '01-7702-0'],
             ['name' => 'Bank', 'value' => 'Raiffeisenbank Mittelthurgau<br/>8570 Weinfelden'],
             ['name' => 'Zugunsten von', 'value' => 'Isle of LAN<br/>8574 Illighausen'],
             ['name' => 'Referenznummer', 'value' => $this->invoice->getNiceReference()],
         ];
+
         foreach($paymentInfo as $info){
             $return .= '<tr>';
             $return .= '<td style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 12px 4px 0;">'.$info['name'].'</td>';
             $return .= '<td class="text-right" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 4px 0 4px 12px;" align="right"><strong style="font-weight: 600;">'.str_replace(' ','&nbsp;',$info['value']).'</strong></td>';
             $return .= '</tr>';
         }
-        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-top-width: 1px; border-top-style: solid; padding: 40px 48px; border: #3e495b;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">'.$return.'</table></td></tr>';
-        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Damit deine Bestellung definitiv wird, du dein Ticket erhältst und einen Sitzplatz reservieren kannst, erwarten wir deine Vorauszahlung bis zum '.$paydate->format("d.m.Y").'. Solltest du weitere Fragen haben, schreib uns eine E-Mail an <a href="mailto:support@isleoflan.ch" style="color: #467fcf; text-decoration: none;">support@isleoflan.ch</a>.<br />Verwende für deine Zahlung einen orangen Einzahlungsschein mit folgenden Daten. Bitte drucke den Einzahlungsschein nicht aus, sondern zahle mit E-Banking. Falls du einen gedruckten Einzahlungsschein benötigst, melde dich bei uns.</p></td></tr>'.$return;
+
+        $return = '<tr><td class="content text-center border-top" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px; border-color: #3e495b;border-top: 1px solid;" align="center"><h4 style="font-weight: 600; font-size: 16px; margin: 0 0 .5em;">Zahlungsdetails</h4><table class="table text-left" cellspacing="0" cellpadding="0" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; border-collapse: collapse; width: 100%; text-align: left;">' .$return.'</table></td></tr>';
+        return '<tr><td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><p style="margin: 0 0 1em;">Damit deine Bestellung definitiv wird, du dein Ticket erhältst und einen Sitzplatz reservieren kannst, erwarten wir deine Vorauszahlung bis zum '.$payDate->format("d.m.Y").'. Solltest du weitere Fragen haben, schreib uns eine E-Mail an <a href="mailto:support@isleoflan.ch" style="color: #467fcf; text-decoration: none;">support@isleoflan.ch</a>.<br />Verwende für deine Zahlung einen orangen Einzahlungsschein mit folgenden Daten. Bitte drucke den Einzahlungsschein nicht aus, sondern zahle mit E-Banking. Falls du einen gedruckten Einzahlungsschein benötigst, melde dich bei uns.</p></td></tr>'.$return;
     }
 
 
@@ -634,6 +618,7 @@ class Order
         return $this->userId;
     }
 
+    #[ArrayShape(['total' => "int", 'sold' => "int", 'reserved' => "int", 'free' => "int"])]
     public function getCounts(): array
     {
         $database = Database::getInstance();
@@ -661,6 +646,15 @@ class Order
         ];
     }
 
+    public function changeToTwint()
+    {
+        $this->paymentMethod = new PaymentMethod(PaymentMethod::TWINT);
+        $database = Database::getInstance();
+        $database->where('id', $this->id);
+        $database->update(self::DB_TABLE, [
+            'payment_method' => $this->paymentMethod->getValue()
+        ]);
+    }
 
 
 }

@@ -53,6 +53,7 @@ try {
 $invoice->createPayment((int)$input['value']);
 
 $order = $invoice->getOrder();
+$order->changeToTwint();
 $order->sendPaymentMail((int)$input['value'], $invoice);
 
 if($invoice->isFullyPayed()) {
