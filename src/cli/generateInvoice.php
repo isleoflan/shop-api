@@ -15,7 +15,7 @@ require_once $basePath . '/_loader.php';
 $orderId = $argv[1] ?? false;
 
 if(!$orderId){
-    die("No invoice ID given");
+    die("No Order ID given");
 }
 
 try{
@@ -25,7 +25,7 @@ try{
 }
 
 $invoice = new Invoice();
-$invoice->createNew($this, '');
+$invoice->createNew($order, '');
 $path = $invoice->generatePDF();
 
 echo $path;
