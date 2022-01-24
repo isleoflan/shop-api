@@ -184,7 +184,7 @@ class Invoice
 
         $pdf->setXY(15, 80);
         $pdf->MultiCell(180, 5, utf8_decode(
-            $this->order->userData['gender'] === Gender::COMPANY ?
+            $this->order->userData['gender'] == Gender::COMPANY ?
             "" :
             "Vielen Dank für deine Bestellung! Wir bitten um eine Einzahlung des Rechnungsbetrags innert 20 Tagen. Falls du Fragen hast, melde dich gerne per E-Mail."
         ), $pdf->borders, 'L');
@@ -254,28 +254,28 @@ class Invoice
 
 
         /* TWINT */
+        if($this->order->userData['gender'] != Gender::COMPANY) {
+            $pdf->setFillColor(239, 239, 239);
+            $pdf->TextCell(15, 155, 180, 30, '', 'L', true);
+            $pdf->Image(File::getBasePath() . '/assets/images/twint.png', 20, 160, 20, 20);
 
-        $pdf->setFillColor(239, 239, 239);
-        $pdf->TextCell(15, 155, 180, 30, '', 'L', true);
-        $pdf->Image(File::getBasePath() . '/assets/images/twint.png', 20, 160, 20, 20);
+            $pdf->setFont('changa-bold', 'B', 8 * 1.4);
+            $pdf->TextCell(45, 160, 145, 5, 'Bezahle deine Rechnung mit TWINT');
+            $pdf->setFont('changa', '', 6 * 1.4);
+            $pdf->TextCell(45, 165, 145, 5, 'Du kannst diese Rechnung ganz beqeuem mit TWINT bezahlen. Sende hierzu einfach eine Zahlung an:');
 
-        $pdf->setFont('changa-bold', 'B', 8 * 1.4);
-        $pdf->TextCell(45, 160, 145, 5, 'Bezahle deine Rechnung mit TWINT');
-        $pdf->setFont('changa', '', 6 * 1.4);
-        $pdf->TextCell(45, 165, 145, 5, 'Du kannst diese Rechnung ganz beqeuem mit TWINT bezahlen. Sende hierzu einfach eine Zahlung an:');
+            $pdf->setFont('changa-bold', 'B', 6 * 1.4);
+            $pdf->TextCell(45, 171, 30, 5, 'Telefonnummer:');
+            $pdf->TextCell(75, 171, 30, 5, 'Empfänger:');
+            $pdf->TextCell(105, 171, 30, 5, 'Betrag:');
+            $pdf->TextCell(135, 171, 30, 5, 'Nachricht:');
 
-
-        $pdf->setFont('changa-bold', 'B', 6 * 1.4);
-        $pdf->TextCell(45, 171, 30, 5, 'Telefonnummer:');
-        $pdf->TextCell(75, 171, 30, 5, 'Empfänger:');
-        $pdf->TextCell(105, 171, 30, 5, 'Betrag:');
-        $pdf->TextCell(135, 171, 30, 5, 'Nachricht:');
-
-        $pdf->setFont('changa', '', 6 * 1.4);
-        $pdf->TextCell(45, 175, 30, 5, '076 688 33 84');
-        $pdf->TextCell(75, 175, 30, 5, 'Isle of LAN');
-        $pdf->TextCell(105, 175, 30, 5, utf8_decode("CHF " . number_format($this->order->getTotal() / 100, 2, ".", "'")));
-        $pdf->TextCell(135, 175, 30, 5, $this->number);
+            $pdf->setFont('changa', '', 6 * 1.4);
+            $pdf->TextCell(45, 175, 30, 5, '076 688 33 84');
+            $pdf->TextCell(75, 175, 30, 5, 'Isle of LAN');
+            $pdf->TextCell(105, 175, 30, 5, utf8_decode("CHF " . number_format($this->order->getTotal() / 100, 2, ".", "'")));
+            $pdf->TextCell(135, 175, 30, 5, $this->number);
+        }
 
 
         $rowHeight = 25.4 / 6;
