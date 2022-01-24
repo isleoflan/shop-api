@@ -2,6 +2,7 @@
 
 namespace IOL\Shop\v1\Entity;
 
+use IOL\Shop\v1\Content\Discord;
 use IOL\Shop\v1\DataSource\Database;
 use IOL\Shop\v1\DataType\Date;
 use IOL\Shop\v1\DataType\UUID;
@@ -46,6 +47,7 @@ class Payment
 
     public function createNew(Invoice $invoice, int $value): void
     {
+
         $this->id = UUID::newId(self::DB_TABLE);
         $this->invoice = $invoice;
         $this->time = new Date('u');
@@ -58,6 +60,42 @@ class Payment
             'time'          => $this->time->format(Date::DATETIME_FORMAT_MICRO),
             'value'         => $this->value
         ]);
+    }
+    public function sendPaymentDiscordWebhook(): void
+    {
+        $data = [
+            'embeds' => [
+                [
+                    'title'			=> 'Bezahlung erhalten',
+                    'description'	=> 'Eine Bestellung wurde bezahlt',
+                    'color'			=> '4859020',
+                    'fields'		=> [
+                        [
+                            'name'		=> 'Bestell-Nr',
+                            'value'		=> $this->invoice->getOrder()->getId(),
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Bezahlt von',
+                            'value'		=> $this->invoice->getOrder()->username,
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Bezahlt mit',
+                            'value'		=> $this->invoice->getOrder()->getPaymentMethod()->getPrettyValue(),
+                            'inline'	=> true,
+                        ],
+                        [
+                            'name'		=> 'Betrag',
+                            'value'		=> 'CHF '.number_format($this->value / 100,2,'.',"'"),
+                            'inline'	=> true,
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        Discord::sendWebhook($data);
     }
 
     /**
