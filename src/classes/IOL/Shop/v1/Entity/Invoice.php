@@ -8,6 +8,7 @@ use IOL\Shop\v1\DataSource\Environment;
 use IOL\Shop\v1\DataSource\File;
 use IOL\Shop\v1\DataType\Date;
 use IOL\Shop\v1\DataType\UUID;
+use IOL\Shop\v1\Enums\Gender;
 use IOL\Shop\v1\Exceptions\InvalidValueException;
 use IOL\Shop\v1\Exceptions\NotFoundException;
 
@@ -182,7 +183,11 @@ class Invoice
 
 
         $pdf->setXY(15, 80);
-        $pdf->MultiCell(180, 5, utf8_decode("Vielen Dank für deine Bestellung! Wir bitten um eine Einzahlung des Rechnungsbetrags innert 20 Tagen. Falls du Fragen hast, melde dich gerne per E-Mail."), $pdf->borders, 'L');
+        $pdf->MultiCell(180, 5, utf8_decode(
+            $this->order->userData['gender'] === Gender::COMPANY ?
+            "" :
+            "Vielen Dank für deine Bestellung! Wir bitten um eine Einzahlung des Rechnungsbetrags innert 20 Tagen. Falls du Fragen hast, melde dich gerne per E-Mail."
+        ), $pdf->borders, 'L');
 
 
         /* CART */
@@ -210,7 +215,7 @@ class Invoice
             $pdf->TextCell(15, $y, 180, $elementHeight, '', 'L', true);
 
             $pdf->setFont('changa', '', 7 * 1.4);
-            $pdf->TextCell(16.5, $y, 10, $elementHeight, ($item->getProduct()->getCategory()->getId() == 3 ? 1 : $item->getAmount()).'x', 'L', true);
+            $pdf->TextCell(16.5, $y, 10, $elementHeight, (in_array($item->getProduct()->getCategory()->getId(),[3,999]) ? 1 : $item->getAmount()).'x', 'L', true);
 
             $pdf->setFont('changa-bold', 'B', 7 * 1.4);
             $pdf->TextCell(26.5, $y, 167, ($hideDescription ? $elementHeight : $elementHeight / 2), $item->getProduct()->getPaymentTitle(), 'L', true);
@@ -225,7 +230,7 @@ class Invoice
 
             $pdf->setFont('changa', '', 7 * 1.4);
             $pdf->TextCell(165, $y, 10, $elementHeight, 'CHF', 'L', true);
-            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format(($item->getProduct()->getCategory()->getId() == 3 ? $item->getPrice() : $item->getProduct()->getPrice()) / 100,2,'.',"'"),  'R', true);
+            $pdf->TextCell(175, $y, 18.5, $elementHeight, number_format((in_array($item->getProduct()->getCategory()->getId(), [3,999]) ? $item->getPrice() : $item->getProduct()->getPrice()) / 100,2,'.',"'"),  'R', true);
 
             $y += $elementHeight;
             $colored = !$colored;
