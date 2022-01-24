@@ -28,5 +28,5 @@ $invoice = new Invoice();
 $invoice->createNew($order, '');
 $path = $invoice->generatePDF();
 
-echo $path;
+\IOL\Shop\v1\Request\APIResponse::getInstance()->addData('path', $path);
 
