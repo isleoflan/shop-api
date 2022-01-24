@@ -123,7 +123,7 @@ class Invoice
 
     public function generateInvoiceNumber(): string
     {
-        return substr(str_replace('.', '', microtime(true)), 2);
+        return str_pad(substr(str_replace('.', '', microtime(true)), 2), 12,"0");
     }
 
     /**
