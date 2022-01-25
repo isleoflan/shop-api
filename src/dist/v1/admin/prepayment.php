@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Genkgo\Camt\Config;
 use Genkgo\Camt\Reader;
 use IOL\Shop\v1\BitMasks\RequestMethod;
-use IOL\Shop\v1\Entity\Voucher;
 use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Request\APIResponse;
 use IOL\SSO\SDK\Client;
@@ -26,7 +25,7 @@ $user = new User($ssoClient);
 $userData = $user->getUserInfo();
 $userData = $userData['response']['data'];
 
-if($userData['scope'] != 8){
+if ($userData['scope'] != 8) {
     $response->addError(991999)->render();
 }
 
@@ -38,42 +37,24 @@ foreach ($statements as $statement) {
     foreach ($entries as $entry) {
         foreach ($entry->getTransactionDetails() as $transactionDetails) {
             $amount = $transactionDetails->getAmount()->getAmount();
-            $currency = $transactionDetails->getAmount()->getCurrency()->getCode();
             $reference = $transactionDetails->getRemittanceInformation()->getCreditorReferenceInformation()->getRef();
-            $booking_date = $entry->getBookingDate();
-            $payer = $transactionDetails->getRelatedParties();
-            $payer_name = $payer[0]->getRelatedPartyType()->getName();
-            try {
-                $payer_iban = $payer[0]->getAccount();
-                $payer_iban = $payer_iban->getIdentification();
-            } catch (Throwable $e){
-                $payer_iban = "Schalterzahlung";
-            }
-            $eid = $reference." / ".$payer_name." / ".$payer_iban;
-
 
 
             try {
                 $invoice = new \IOL\Shop\v1\Entity\Invoice(reference: $reference);
-            } catch(IOLException){
+            } catch (IOLException) {
                 $response->addError(991001)->render();
             }
 
-            var_dump($amount);
-            var_dump($invoice);
-
-/*
-            $invoice->createPayment((int)$input['value']);
+            $invoice->createPayment((int)$amount);
 
             $order = $invoice->getOrder();
             $order->changeToTwint();
-            $order->sendPaymentMail((int)$input['value'], $invoice);
+            $order->sendPaymentMail((int)$amount, $invoice);
 
-            if($invoice->isFullyPayed()) {
+            if ($invoice->isFullyPayed()) {
                 $order->completeOrder();
             }
-
-*/
         }
     }
 }
