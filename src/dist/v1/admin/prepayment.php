@@ -49,7 +49,6 @@ foreach ($statements as $statement) {
             $invoice->createPayment((int)$amount);
 
             $order = $invoice->getOrder();
-            $order->changeToTwint();
             $order->sendPaymentMail((int)$amount, $invoice);
 
             if ($invoice->isFullyPayed()) {
