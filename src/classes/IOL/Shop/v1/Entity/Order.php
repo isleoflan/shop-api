@@ -116,9 +116,13 @@ class Order
         }
         $database = Database::getInstance();
         $data = $database->query('SELECT * FROM '.self::DB_TABLE.' WHERE user_id = \''.$userId.'\' AND (status = "'.OrderStatus::CREATED.'" OR status = \''.OrderStatus::FINISHED.'\') LIMIT 1');
-        if(isset($data[0])){
-            $this->loadData($data[0]);
-            return true;
+        foreach($data as $orderData){
+            $order = new Order();
+            $order->loadData($orderData);
+
+            if($order->hasTicket()) {
+                return true;
+            }
         }
         return false;
 
