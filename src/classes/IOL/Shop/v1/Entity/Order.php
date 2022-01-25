@@ -624,13 +624,17 @@ class Order
         $finished = 0;
         $created = 0;
 
-        foreach($data as $order){
-            switch($order['status']){
-                case OrderStatus::FINISHED:
-                    $finished++;
-                    break;
-                case OrderStatus::CREATED:
-                    $created++;
+        foreach($data as $orderData){
+            $order = new Order();
+            $order->loadData($orderData);
+            if($order->hasTicket()) {
+                switch ($order->getOrderStatus()->getValue()) {
+                    case OrderStatus::FINISHED:
+                        $finished++;
+                        break;
+                    case OrderStatus::CREATED:
+                        $created++;
+                }
             }
         }
 
@@ -650,6 +654,14 @@ class Order
         $database->update(self::DB_TABLE, [
             'payment_method' => $this->paymentMethod->getValue()
         ]);
+    }
+
+    /**
+     * @return OrderStatus
+     */
+    public function getOrderStatus(): OrderStatus
+    {
+        return $this->orderStatus;
     }
 
 
