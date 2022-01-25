@@ -30,7 +30,7 @@ class Invoice
      * @throws NotFoundException
      * @throws InvalidValueException
      */
-    public function __construct(?string $id = null, ?int $number = null)
+    public function __construct(?string $id = null, ?int $number = null, string|int|null $reference = null)
     {
         if (!is_null($id)) {
             if (!UUID::isValid($id)) {
@@ -41,6 +41,19 @@ class Invoice
         if (!is_null($number)) {
             $this->loadData(Database::getRow('number', $number, self::DB_TABLE));
         }
+        if (!is_null($reference)) {
+            $number = $this->getNumberFromReference($reference);
+            $this->loadData(Database::getRow('number', $number, self::DB_TABLE));
+        }
+    }
+
+    public function getNumberFromReference(string|int $reference): int
+    {
+        $number = substr($reference, strlen(self::ESR_ID), strlen($reference) - strlen(self::ESR_ID) - 1);
+        while(substr($number,0,1) == "0"){
+            $number = substr($number, 1);
+        }
+        return (int)$number;
     }
 
     /**
