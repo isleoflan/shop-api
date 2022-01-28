@@ -60,6 +60,8 @@ class Payment
             'time'          => $this->time->format(Date::DATETIME_FORMAT_MICRO),
             'value'         => $this->value
         ]);
+
+        $this->sendPaymentDiscordWebhook();
     }
     public function sendPaymentDiscordWebhook(): void
     {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use IOL\Shop\v1\BitMasks\RequestMethod;
+use IOL\Shop\v1\Entity\Order;
 use IOL\Shop\v1\Entity\Voucher;
 use IOL\Shop\v1\Exceptions\IOLException;
 use IOL\Shop\v1\Request\APIResponse;
@@ -57,6 +58,7 @@ foreach (
         'address' => 601005,
         'zipCode' => 601006,
         'city' => 601007,
+        'vegetarian' => 601008,
     ] as $userField => $errorCode
 ) {
     if (!isset($input['user'][$userField])) {
@@ -64,6 +66,10 @@ foreach (
     }
 }
 
+
+if(count($input['cart']) === 0){
+    $response->addError(601011);
+}
 foreach ($input['cart'] as $cartItem) {
     foreach ([
                  'id' => 601008,
@@ -80,6 +86,13 @@ try {
     $paymentMethod = new \IOL\Shop\v1\Enums\PaymentMethod($input['paymentType']);
 } catch (IOLException $e) {
     $response->addError(601103);
+}
+
+$order = new Order();
+if($order->loadForUser($userID)){
+    if($order->hasTicket()){
+        $response->addError(601104);
+    }
 }
 
 

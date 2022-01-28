@@ -173,6 +173,10 @@
     "message": "Field variant for cart item missing or invalid",
     "errorCode": 400
   },
+  "601011": {
+    "message": "Your cart is empty",
+    "errorCode": 403
+  },
   "602001": {
     "message": "Invalid Product",
     "errorCode": 404
@@ -208,6 +212,10 @@
   },
   "601202": {
     "message": "Field userId missing or invalid",
+    "errorCode": 400
+  },
+  "601203": {
+    "message": "You already placed an order. Please fulfill the existing order first or contact us at support@isleoflan.ch",
     "errorCode": 400
   },
 
