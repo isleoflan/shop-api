@@ -19,6 +19,7 @@
     "setasign/fpdf": "^1.8",
     "endroid/qr-code": "^4.4.7",
     "genkgo/camt": "^1.0",
+    "andrew-svirin/ebics-client-php": "^v2.0.1",
     "ext-sockets": "*",
     "ext-curl": "*"
   }
