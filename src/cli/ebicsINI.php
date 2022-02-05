@@ -55,18 +55,6 @@ try {
     );
 }
 
-try {
-    $client->HPB();
-    $keyRingManager->saveKeyRing($keyRing);
-} catch (EbicsResponseExceptionInterface $exception) {
-    echo sprintf(
-        "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
-        $exception->getResponseCode(),
-        $exception->getMessage(),
-        $exception->getMeaning()
-    );
-}
-
 /* @var \AndrewSvirin\Ebics\EbicsClient $client */
 $ebicsBankLetter = new \AndrewSvirin\Ebics\EbicsBankLetter();
 
