@@ -15,7 +15,6 @@ for ($returnDirs = 0; $returnDirs < 1; $returnDirs++) {
     $basePath = substr($basePath, 0, strrpos($basePath, '/'));
 }
 
-
 require_once $basePath . '/_loader.php';
 
 
