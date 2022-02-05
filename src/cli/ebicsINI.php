@@ -23,7 +23,7 @@ $keyRingRealPath = File::getBasePath().'/assets/ebics/ebicsKeyring.json';
 $keyRingManager = new KeyRingManager($keyRingRealPath, Environment::get('EBICS_KEYRING_PASSPHRASE'));
 $keyRing = $keyRingManager->loadKeyRing();
 
-$bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_HOST_URL'), Bank::VERSION_30);
+$bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_URL'), Bank::VERSION_30);
 $bank->setIsCertified(false);
 $user = new User(Environment::get('EBICS_CONTRACT_ID'), Environment::get('EBICS_SUBSCRIBER_ID'));
 $client = new EbicsClient($bank, $user, $keyRing);
