@@ -67,4 +67,4 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
 $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 file_put_contents(File::getBasePath().'/assets/ebics/INIletter.pdf', $txt);
 
-echo $txt;
+\IOL\Shop\v1\Request\APIResponse::getInstance()->addData('pdf',$txt);
