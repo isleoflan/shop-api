@@ -24,7 +24,7 @@ $keyRing = $keyRingManager->loadKeyRing();
 
 $bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_URL'), Bank::VERSION_30);
 $bank->setIsCertified(false);
-$user = new User(Environment::get('EBICS_CONTRACT_ID'), Environment::get('EBICS_SUBSCRIBER_ID'));
+$user = new User(Environment::get('EBICS_PARTNER_ID'), Environment::get('EBICS_USER_ID'));
 $client = new EbicsClient($bank, $user, $keyRing);
 
 

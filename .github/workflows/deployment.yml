@@ -89,6 +89,7 @@ jobs:
             cd live
             date +"%y.%V.%u-%H%M" > classes/IOL/Shop/v1/VERSION.vsf
             mkdir assets/ebics
+            chmod 777 assets/ebics
             ln -s "${{ secrets.BASE_PATH }}${{ secrets.DEPLOYMENTS_FOLDER }}/ebicsKeyring.json" assets/ebics/ebicsKeyring.json
 
       
