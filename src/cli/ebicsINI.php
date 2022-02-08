@@ -18,13 +18,13 @@ for ($returnDirs = 0; $returnDirs < 1; $returnDirs++) {
 require_once $basePath . '/_loader.php';
 
 
-$keyRingRealPath = File::getBasePath().'/assets/ebics/ebicsKeyring.json';
+$keyRingRealPath = File::getBasePath().'/assets/ebics/ebicsCompanyKeyring.json';
 $keyRingManager = new KeyRingManager($keyRingRealPath, Environment::get('EBICS_KEYRING_PASSPHRASE'));
 $keyRing = $keyRingManager->loadKeyRing();
 
 $bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_URL'), Bank::VERSION_30);
 $bank->setIsCertified(false);
-$user = new User(Environment::get('EBICS_PARTNER_ID'), Environment::get('EBICS_USER_ID'));
+$user = new User(Environment::get('EBICS_COMPANY_PARTNER_ID'), Environment::get('EBICS_USER_ID'));
 $client = new EbicsClient($bank, $user, $keyRing);
 
 
@@ -65,6 +65,6 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
 );
 
 $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
-file_put_contents(File::getBasePath().'/assets/ebics/INIletter.pdf', $txt);
+file_put_contents(File::getBasePath().'/assets/ebics/companyINIletter.pdf', $txt);
 
 \IOL\Shop\v1\Request\APIResponse::getInstance()->addData('pdf',$txt);
