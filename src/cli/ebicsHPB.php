@@ -18,23 +18,26 @@ for ($returnDirs = 0; $returnDirs < 1; $returnDirs++) {
 require_once $basePath . '/_loader.php';
 
 
-$keyRingRealPath = File::getBasePath().'/assets/ebics/ebicsPrivateKeyring.json';
-$keyRingManager = new KeyRingManager($keyRingRealPath, Environment::get('EBICS_KEYRING_PASSPHRASE'));
-$keyRing = $keyRingManager->loadKeyRing();
+foreach (['Private', 'Company'] as $userType) {
+    $keyRingRealPath = File::getBasePath() . '/assets/ebics/ebics' . $userType . 'Keyring.json';
+    $keyRingManager = new KeyRingManager($keyRingRealPath, Environment::get('EBICS_KEYRING_PASSPHRASE'));
+    $keyRing = $keyRingManager->loadKeyRing();
 
-$bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_URL'), Bank::VERSION_25);
-$bank->setIsCertified(false);
-$user = new User(Environment::get('EBICS_PRIVATE_PARTNER_ID'), Environment::get('EBICS_USER_ID'));
-$client = new EbicsClient($bank, $user, $keyRing);
+    $bank = new Bank(Environment::get('EBICS_HOST_ID'), Environment::get('EBICS_URL'), Bank::VERSION_25);
+    $bank->setIsCertified(false);
+    $user = new User(Environment::get('EBICS_USER_ID'), Environment::get('EBICS_' . strtoupper($userType) . '_PARTNER_ID'));
+    $client = new EbicsClient($bank, $user, $keyRing);
 
-try {
-    $client->HPB();
-    $keyRingManager->saveKeyRing($keyRing);
-} catch (EbicsResponseExceptionInterface $exception) {
-    echo sprintf(
-        "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
-        $exception->getResponseCode(),
-        $exception->getMessage(),
-        $exception->getMeaning()
-    );
+
+    try {
+        $client->HPB();
+        $keyRingManager->saveKeyRing($keyRing);
+    } catch (EbicsResponseExceptionInterface $exception) {
+        echo sprintf(
+            "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+            $exception->getResponseCode(),
+            $exception->getMessage(),
+            $exception->getMeaning()
+        );
+    }
 }
