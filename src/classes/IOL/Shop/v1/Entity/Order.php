@@ -22,6 +22,9 @@ use IOL\Shop\v1\PaymentProvider\Crypto;
 use IOL\Shop\v1\PaymentProvider\PayPal;
 use IOL\Shop\v1\PaymentProvider\Prepayment;
 use IOL\Shop\v1\PaymentProvider\Stripe;
+use IOL\Shop\v1\Request\APIResponse;
+use IOL\SSO\SDK\Client;
+use IOL\SSO\SDK\Service\User;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
@@ -465,7 +468,7 @@ class Order
                     break;
             }
 
-            if(in_array($item->getProduct()->getId(), array_keys($foodItems))){
+            if(array_key_exists($item->getProduct()->getId(), $foodItems)){
                 $database->insert('food', [
                     'user_id' => $this->userId,
                     'product_id' => $item->getProduct()->getId()
@@ -644,6 +647,41 @@ class Order
             'reserved' => $created,
             'free' => self::MAX_TICKETS - $finished - $created,
         ];
+    }
+
+    public function getAttendees(): array
+    {
+        $database = Database::getInstance();
+        $database->where('status', OrderStatus::CANCELLED, '<>');
+        $data = $database->get(self::DB_TABLE);
+
+        $return = [];
+
+        $ssoClient = new Client(APIResponse::APP_TOKEN);
+        $user = new User($ssoClient);
+        $allUsers = $user->getList();
+        $allUsers = $allUsers['response']['data'];
+
+
+        foreach($data as $orderData){
+            $order = new Order();
+            $order->loadData($orderData);
+
+            $attendee = $allUsers[$order->userId];
+
+            if($order->hasTicket()) {
+                switch ($order->getOrderStatus()->getValue()) {
+                    case OrderStatus::FINISHED:
+                        $attendee['status'] = 'PAYED';
+                        break;
+                    case OrderStatus::CREATED:
+                        $attendee['status'] = 'BOUGHT';
+                }
+                $return[] = $attendee;
+            }
+        }
+
+        return $return;
     }
 
     public function changeToTwint()
