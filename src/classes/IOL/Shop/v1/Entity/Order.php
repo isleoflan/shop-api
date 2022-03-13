@@ -653,6 +653,7 @@ class Order
     {
         $database = Database::getInstance();
         $database->where('status', OrderStatus::CANCELLED, '<>');
+        $database->orderBy('created', 'DESC');
         $data = $database->get(self::DB_TABLE);
 
         $return = [];
