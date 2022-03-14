@@ -346,12 +346,14 @@ class Order
                         $mail->addAttachment($this->generateInvoice());
                         $mail->addVariable('paymentdetails', $this->getMailPaymentInfo().$this->getTwintText());
                     }
+                    $mail->addVariable('seatbutton', '');
                     break;
                 case PaymentMethod::STRIPE:
                 case PaymentMethod::PAYPAL:
                 case PaymentMethod::CRYPTO:
                     $mail->addAttachment($this->generateTicket());
                     $mail->addVariable('paymentdetails', '');
+                    $mail->addVariable('seatbutton', $this->getSeatButton());
                     break;
             }
 
@@ -359,6 +361,28 @@ class Order
             $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
             $mailerQueue->publishMessage(json_encode($mail), new QueueType(QueueType::MAILER));
         }
+    }
+
+    public function getSeatButton(): string
+    {
+        return '<tr>'.
+            '<td class="content" style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, '.
+            'Helvetica Neue, Helvetica, Arial, sans-serif; padding: 40px 48px;"><table cellspacing="0" cellpadding="0" '.
+            'style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, '.
+            'Arial, sans-serif; border-collapse: collapse; width: 100%;"><tbody><tr><td align="center" '.
+            'style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, '.
+            'Arial, sans-serif;"><table cellpadding="0" cellspacing="0" border="0" class="bg-green rounded" '.
+            'style="font-family: Open Sans, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, '.
+            'Arial, sans-serif; border-collapse: separate; width: 100%; color: #ffffff; border-radius: 3px;" '.
+            'bgcolor="#5eba00"><tbody><tr><td align="center" valign="top" class="lh-1" style="font-family: Open Sans, '.
+            '-apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif; '.
+            'line-height: 100%;"><a href="https://dashboard.isleoflan.ch" class="btn bg-green border-green" '.
+            'style="color: #ffffff; padding: 12px 32px; border: 1px solid #5eba00; text-decoration: none; '.
+            'white-space: nowrap; font-weight: 600; font-size: 16px; border-radius: 3px; line-height: 100%; '.
+            'display: block; -webkit-transition: .3s background-color; transition: .3s background-color; '.
+            'background-color: #5eba00;"><span class="btn-span" style="color: #ffffff; font-size: 16px; '.
+            'text-decoration: none; white-space: nowrap; font-weight: 600; line-height: 100%;">'.
+            'Jetzt Sitzplatz reservieren</span></a></td></tr></tbody></table></td></tr></tbody></table></td></tr>';
     }
 
     public function sendPaymentMail(int $payedValue, Invoice $invoice): void
@@ -382,7 +406,12 @@ class Order
         if($invoice->isFullyPayed()){
             if($this->hasTicket()){
                 $mail->addAttachment($this->generateTicket());
+                $mail->addVariable('seatbutton', $this->getSeatButton());
+            } else {
+                $mail->addVariable('seatbutton', '');
             }
+        } else {
+            $mail->addVariable('seatbutton', '');
         }
 
         $mailerQueue = new Queue(new QueueType(QueueType::MAILER));
